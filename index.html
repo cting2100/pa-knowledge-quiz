@@ -5,1091 +5,355 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>動動腦·身體活動知識挑戰</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  color: #fff; padding: 20px;
-}
-.container {
-  max-width: 640px; width: 100%; background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px); border-radius: 24px; padding: 32px 28px;
-  border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-  transition: all 0.3s;
-}
-.screen { display: none; }
-.screen.active { display: block; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff;padding:20px}
+.container{max-width:640px;width:100%;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border-radius:24px;padding:32px 28px;border:1px solid rgba(255,255,255,0.12);box-shadow:0 25px 60px rgba(0,0,0,0.3)}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:28px;text-align:center;margin-bottom:6px;font-weight:800}
+h2{font-size:20px;text-align:center;margin-bottom:20px;font-weight:600;color:#7ee8d6}
+.subtitle{text-align:center;color:#a0b8c8;font-size:14px;margin-bottom:24px;line-height:1.6}
+input[type=text],input[type=number]{width:100%;padding:14px 18px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:18px;outline:none;text-align:center;transition:border .3s}
+input[type=text]:focus,input[type=number]:focus{border-color:#7ee8d6}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;border:none;transition:all .25s;margin-top:14px;letter-spacing:1px}
+.btn-primary{background:linear-gradient(135deg,#11998e,#38ef7d);color:#000}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(56,239,125,0.3)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)}
+.btn-secondary:hover{background:rgba(255,255,255,0.18)}
+.progress-bar{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#11998e,#38ef7d);border-radius:3px;transition:width .4s}
+.q-num{font-size:13px;color:#7ee8d6;margin-bottom:8px}
+.q-text{font-size:19px;font-weight:600;margin-bottom:20px;line-height:1.5}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:14px 18px;border-radius:12px;border:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);cursor:pointer;transition:all .2s;font-size:16px}
+.option:hover{border-color:#7ee8d6;background:rgba(126,232,214,0.1)}
+.option.correct{border-color:#38ef7d;background:rgba(56,239,125,0.2);animation:pulse .4s}
+.option.wrong{border-color:#ff4757;background:rgba(255,71,87,0.2);animation:shake .4s}
+.option.disabled{pointer-events:none;opacity:0.85}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.timer{text-align:center;font-size:14px;color:#a0b8c8;margin-bottom:12px}
+.feedback{text-align:center;padding:12px;border-radius:10px;margin:12px 0;font-weight:700;font-size:15px;display:none}
+.feedback.show{display:block}
+.feedback.correct-fb{background:rgba(56,239,125,0.15);color:#38ef7d}
+.feedback.wrong-fb{background:rgba(255,71,87,0.15);color:#ff4757}
+.feedback-detail{text-align:left;padding:10px 14px;border-radius:10px;margin:8px 0;background:rgba(126,232,214,0.08);border:1px solid rgba(126,232,214,0.15);font-size:13px;color:#b0c8d8;line-height:1.7;display:none}
+.feedback-detail.show{display:block}
+.feedback-source{font-size:11px;color:#6a8898;margin-top:4px}
+.score-display{display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;color:#a0b8c8}
+.score-display span{font-weight:700;color:#7ee8d6}
+.result-icon{text-align:center;font-size:64px;margin:10px 0}
+.result-score{text-align:center;font-size:48px;font-weight:800;color:#38ef7d;margin:8px 0}
+.result-detail{text-align:center;color:#a0b8c8;font-size:14px;line-height:1.8;margin-bottom:16px}
+.leaderboard{margin-top:20px}
+.leaderboard h3{font-size:16px;color:#7ee8d6;margin-bottom:10px;text-align:center}
+.lb-row{display:flex;justify-content:space-between;padding:10px 14px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.04);font-size:14px}
+.lb-row:first-child{background:rgba(56,239,125,0.1);border:1px solid rgba(56,239,125,0.3)}
+.lb-name{font-weight:600}.lb-score{color:#38ef7d;font-weight:700}
+.loading{text-align:center;padding:20px;color:#a0b8c8}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.2);border-top-color:#7ee8d6;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.small{font-size:12px;color:#6a8898;text-align:center;margin-top:16px}
+.ai-panel{margin:16px 0;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(102,51,153,0.15),rgba(72,52,212,0.15));border:1px solid rgba(126,232,214,0.2)}
+.ai-panel h3{color:#b794f4;font-size:15px;margin-bottom:8px}
+.ai-content{font-size:14px;color:#d0c8e8;line-height:1.7;white-space:pre-wrap}
+.ai-typing{color:#7ee8d6;font-size:13px}
+.ai-error{color:#ff6b6b;font-size:13px}
 
-h1 { font-size: 28px; text-align: center; margin-bottom: 6px; font-weight: 800; }
-h2 { font-size: 20px; text-align: center; margin-bottom: 20px; font-weight: 600; color: #7ee8d6; }
-.subtitle { text-align: center; color: #a0b8c8; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
-
-input[type=text] {
-  width: 100%; padding: 14px 18px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06); color: #fff; font-size: 18px; outline: none;
-  transition: border 0.3s; text-align: center;
-}
-input[type=text]:focus { border-color: #7ee8d6; }
-
-.btn {
-  display: block; width: 100%; padding: 14px; border-radius: 12px; font-size: 17px;
-  font-weight: 700; cursor: pointer; border: none; transition: all 0.25s;
-  margin-top: 14px; letter-spacing: 1px;
-}
-.btn-primary { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56,239,125,0.3); }
-.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-.btn-secondary:hover { background: rgba(255,255,255,0.18); }
-
-.progress-bar {
-  width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
-  margin-bottom: 20px; overflow: hidden;
-}
-.progress-fill { height: 100%; background: linear-gradient(90deg, #11998e, #38ef7d); border-radius: 3px; transition: width 0.4s; }
-
-.question-number { font-size: 13px; color: #7ee8d6; margin-bottom: 8px; }
-.question-text { font-size: 19px; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
-
-.options { display: flex; flex-direction: column; gap: 10px; }
-.option {
-  padding: 14px 18px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04); cursor: pointer; transition: all 0.2s;
-  font-size: 16px; position: relative;
-}
-.option:hover { border-color: #7ee8d6; background: rgba(126,232,214,0.1); }
-.option.correct { border-color: #38ef7d; background: rgba(56,239,125,0.2); animation: pulse 0.4s; }
-.option.wrong { border-color: #ff4757; background: rgba(255,71,87,0.2); animation: shake 0.4s; }
-.option.disabled { pointer-events: none; opacity: 0.85; }
-
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
-
-.timer { text-align: center; font-size: 14px; color: #a0b8c8; margin-bottom: 12px; }
-.feedback {
-  text-align: center; padding: 12px; border-radius: 10px; margin: 12px 0;
-  font-weight: 700; font-size: 15px; display: none;
-}
-.feedback.show { display: block; }
-.feedback.correct-fb { background: rgba(56,239,125,0.15); color: #38ef7d; }
-.feedback.wrong-fb { background: rgba(255,71,87,0.15); color: #ff4757; }
-
-.score-display { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px; color: #a0b8c8; }
-.score-display span { font-weight: 700; color: #7ee8d6; }
-
-.result-icon { text-align: center; font-size: 64px; margin: 10px 0; }
-.result-score { text-align: center; font-size: 48px; font-weight: 800; color: #38ef7d; margin: 8px 0; }
-.result-detail { text-align: center; color: #a0b8c8; font-size: 14px; line-height: 1.8; margin-bottom: 16px; }
-
-.leaderboard { margin-top: 20px; }
-.leaderboard h3 { font-size: 16px; color: #7ee8d6; margin-bottom: 10px; text-align: center; }
-.lb-row {
-  display: flex; justify-content: space-between; padding: 10px 14px; border-radius: 8px;
-  margin-bottom: 6px; background: rgba(255,255,255,0.04); font-size: 14px;
-}
-.lb-row:first-child { background: rgba(56,239,125,0.1); border: 1px solid rgba(56,239,125,0.3); }
-.lb-name { font-weight: 600; }
-.lb-score { color: #38ef7d; font-weight: 700; }
-
-.loading { text-align: center; padding: 20px; color: #a0b8c8; }
-.spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #7ee8d6; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.small { font-size: 12px; color: #6a8898; text-align: center; margin-top: 16px; }
-/* ====== AI PANEL ====== */
-.ai-panel {
-  margin: 16px 0; padding: 16px; border-radius: 14px;
-  background: linear-gradient(135deg, rgba(102,51,153,0.15), rgba(72,52,212,0.15));
-  border: 1px solid rgba(126,232,214,0.2);
-}
-.ai-panel h3 { color: #b794f4; font-size: 15px; margin-bottom: 8px; }
-.ai-content { font-size: 14px; color: #d0c8e8; line-height: 1.7; white-space: pre-wrap; }
-.ai-typing { color: #7ee8d6; font-size: 13px; }
-.ai-error { color: #ff6b6b; font-size: 13px; }
+/* MOVE GAME - embedded inline */
+.move-section{margin:20px 0;background:linear-gradient(135deg,rgba(255,71,87,0.1),rgba(55,66,250,0.1));border-radius:16px;border:2px dashed rgba(255,71,87,0.25);overflow:hidden}
+.move-header{padding:18px;cursor:pointer;text-align:center}
+.move-header h3{font-size:20px;color:#ff6b81;margin-bottom:4px}
+.move-header .hint{font-size:12px;color:#a0b8c8}
+.move-body{display:none;padding:0 18px 18px}
+.move-body.open{display:block}
+.move-phase{font-size:14px;color:#7ee8d6;text-align:center;margin-bottom:4px}
+.move-count{font-size:13px;color:#a0b8c8;text-align:center;margin-bottom:12px}
+.move-instruction{font-size:22px;font-weight:800;text-align:center;min-height:36px;margin-bottom:10px;transition:all .2s}
+.move-legend{display:flex;gap:16px;justify-content:center;margin-bottom:14px;font-size:13px;color:#a0b8c8}
+.move-legend span{display:flex;align-items:center;gap:6px}
+.move-dot{width:16px;height:16px;border-radius:4px;display:inline-block}
+.move-square{width:160px;height:160px;margin:0 auto 16px;border-radius:20px;background:#555;transition:background .15s,transform .15s;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900}
+.move-square.pop{animation:popIn .3s ease-out}
+@keyframes popIn{0%{transform:scale(0.3);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.move-square.red{background:#ff4757;box-shadow:0 0 60px rgba(255,71,87,0.6)}
+.move-square.blue{background:#3742fa;box-shadow:0 0 60px rgba(55,66,250,0.6)}
+.move-square.gray{background:#555}
+.move-progress{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:10px 0;overflow:hidden}
+.move-progress-fill{height:100%;background:#38ef7d;border-radius:3px;transition:width .3s}
+.move-done{text-align:center;display:none}
+.move-done .icon{font-size:48px}
+.move-done .msg{font-size:16px;color:#38ef7d;font-weight:800;margin:8px 0}
+.move-done .sub{font-size:13px;color:#a0b8c8;line-height:1.6}
 /* CHAT */
-.chat-modal {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center; z-index: 100;
-}
-.chat-box {
-  width: 90%; max-width: 500px; max-height: 80vh; background: #1a2a3a;
-  border-radius: 18px; border: 1px solid rgba(126,232,214,0.3);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.chat-header {
-  padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.1);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.chat-header span { font-weight: 700; color: #7ee8d6; }
-.chat-close { background: none; border: none; color: #a0b8c8; font-size: 20px; cursor: pointer; }
-.chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
-.chat-msg.ai { background: rgba(72,52,212,0.3); align-self: flex-start; color: #d0c8e8; }
-.chat-msg.user { background: rgba(56,239,125,0.2); align-self: flex-end; color: #fff; }
-.chat-input-row { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; }
-.chat-input-row input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; outline: none; }
-.chat-input-row button { padding: 10px 18px; border-radius: 10px; border: none; background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; font-weight: 700; cursor: pointer; }
-/* IPAQ SURVEY */
-.survey-q { margin-bottom: 20px; }
-.survey-q label { display: block; font-size: 14px; color: #a0b8c8; margin-bottom: 6px; }
-.survey-q .q-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-.survey-row { display: flex; gap: 12px; }
-.survey-field { flex: 1; }
-.survey-field span { display: block; font-size: 12px; color: #6a8898; margin-bottom: 4px; }
-.survey-field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; outline: none; text-align: center; }
-.survey-hint { font-size: 11px; color: #5a7888; margin-top: 4px; }
-.ipa-feedback-card {
-  margin: 14px 0; padding: 16px; border-radius: 14px;
-  background: linear-gradient(135deg, rgba(0,180,140,0.12), rgba(56,239,125,0.08));
-  border: 1px solid rgba(56,239,125,0.25);
-}
-.ipa-feedback-card h3 { font-size: 15px; margin-bottom: 8px; }
-.ipa-level { font-size: 22px; font-weight: 800; margin: 4px 0; }
-.ipa-level.low { color: #ff4757; }
-.ipa-level.moderate { color: #ffa502; }
-.ipa-level.high { color: #38ef7d; }
-.ipa-detail { font-size: 13px; color: #a0b8c8; line-height: 1.6; }
-.ipa-bar { height: 8px; border-radius: 4px; margin: 10px 0; background: rgba(255,255,255,0.1); overflow: hidden; }
-.ipa-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
-/* ====== MOVE GAME ====== */
-.move-container { text-align: center; padding: 10px 0; }
-.move-phase { font-size: 14px; color: #7ee8d6; margin-bottom: 4px; }
-.move-count { font-size: 13px; color: #a0b8c8; margin-bottom: 16px; }
-.move-instruction { font-size: 22px; font-weight: 800; min-height: 36px; margin-bottom: 12px; transition: all 0.2s; }
-.move-square {
-  width: 180px; height: 180px; margin: 0 auto 20px; border-radius: 24px;
-  background: #555; transition: background 0.15s, transform 0.15s;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px; font-weight: 900;
-}
-.move-square.show { animation: popIn 0.3s ease-out; }
-@keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
-@keyframes pulseBtn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-.move-square.red { background: #ff4757; box-shadow: 0 0 60px rgba(255,71,87,0.6); }
-.move-square.blue { background: #3742fa; box-shadow: 0 0 60px rgba(55,66,250,0.6); }
-.move-square.gray { background: #555; }
-.move-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 10px 0; overflow: hidden; }
-.move-progress-fill { height: 100%; background: #38ef7d; border-radius: 3px; transition: width 0.3s; }
-.move-result { font-size: 36px; font-weight: 800; color: #38ef7d; margin: 16px 0; }
-.move-complete-msg { font-size: 15px; color: #a0b8c8; line-height: 1.6; }
-.move-legend { display: flex; gap: 16px; justify-content: center; margin-bottom: 16px; font-size: 13px; color: #a0b8c8; }
-.move-legend span { display: flex; align-items: center; gap: 6px; }
-.move-legend .dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+.chat-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:200}
+.chat-box{width:90%;max-width:500px;max-height:80vh;background:#1a2a3a;border-radius:18px;border:1px solid rgba(126,232,214,0.3);display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center}
+.chat-header span{font-weight:700;color:#7ee8d6}
+.chat-close{background:none;border:none;color:#a0b8c8;font-size:20px;cursor:pointer}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5}
+.chat-msg.ai{background:rgba(72,52,212,0.3);align-self:flex-start;color:#d0c8e8}
+.chat-msg.user{background:rgba(56,239,125,0.2);align-self:flex-end;color:#fff}
+.chat-input-row{padding:12px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:8px}
+.chat-input-row input{flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none;text-align:left}
+.chat-input-row button{padding:10px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,#11998e,#38ef7d);color:#000;font-weight:700;cursor:pointer}
+/* SURVEY */
+.survey-q{margin-bottom:20px}
+.survey-q .q-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px}
+.survey-q label{display:block;font-size:14px;color:#a0b8c8;margin-bottom:6px}
+.survey-row{display:flex;gap:12px}
+.survey-field{flex:1}
+.survey-field span{display:block;font-size:12px;color:#6a8898;margin-bottom:4px}
+.survey-field input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none;text-align:center}
+.ipa-feedback-card{margin:14px 0;padding:16px;border-radius:14px;background:linear-gradient(135deg,rgba(0,180,140,0.12),rgba(56,239,125,0.08));border:1px solid rgba(56,239,125,0.25)}
+.ipa-feedback-card h3{font-size:15px;margin-bottom:8px}
+.ipa-level{font-size:22px;font-weight:800;margin:4px 0}
+.ipa-level.low{color:#ff4757}.ipa-level.moderate{color:#ffa502}.ipa-level.high{color:#38ef7d}
+.ipa-detail{font-size:13px;color:#a0b8c8;line-height:1.6}
+.ipa-bar{height:8px;border-radius:4px;margin:10px 0;background:rgba(255,255,255,0.1);overflow:hidden}
+.ipa-bar-fill{height:100%;border-radius:4px;transition:width 1s}
+.music-btn{position:fixed;bottom:16px;right:16px;z-index:200;display:none}
+.music-btn button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.6);color:#fff;font-size:20px;cursor:pointer;backdrop-filter:blur(8px)}
 </style>
 </head>
 <body>
-
-<!-- BACKGROUND MUSIC -->
-<div id="musicPlayer" style="position:fixed;bottom:16px;right:16px;z-index:200;display:none;">
-  <button id="musicBtn" onclick="toggleMusic()" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.6);color:#fff;font-size:20px;cursor:pointer;backdrop-filter:blur(8px);">🔇</button>
-</div>
-<iframe id="ytBgMusic" style="display:none" allow="autoplay"></iframe>
+<iframe id="ytBg" style="display:none" allow="autoplay"></iframe>
+<div id="musicBtn" class="music-btn"><button id="mBtn" onclick="toggleMusic()">🔇</button></div>
 
 <div class="container">
 
-  <!-- START SCREEN -->
-  <div id="startScreen" class="screen active">
-    <h1>🧠 動動腦</h1>
-    <h2>身體活動知識挑戰</h2>
-    <p class="subtitle">
-      你知道怎麼聰明地動起來嗎？<br>
-      短時間衝一下跟長時間慢慢走，哪個效果好？<br>
-      來測測你的「身體活動 IQ」吧！
-    </p>
-    <input type="text" id="playerName" placeholder="輸入你的名字或暱稱" maxlength="20" autocomplete="off">
-    <button class="btn btn-primary" onclick="goToSurvey()">開始挑戰 🚀</button>
-    <div class="small">題目設計來自最新運動科學研究，用白話講給你聽 ✌️</div>
-  </div>
+<!-- START -->
+<div id="startScreen" class="screen active">
+<h1>🧠 動動腦</h1>
+<h2>身體活動知識挑戰</h2>
+<p class="subtitle">你知道怎麼聰明地動起來嗎？<br>短時間衝一下跟長時間慢慢走，哪個效果好？<br>來測測你的「身體活動 IQ」吧！</p>
+<input type="text" id="playerName" placeholder="輸入你的名字或暱稱" maxlength="20" autocomplete="off">
+<button class="btn btn-primary" onclick="goToSurvey()">開始挑戰 🚀</button>
+<div class="small">題目來自最新運動科學研究，用白話講給你聽 ✌️</div>
+</div>
 
-  <!-- IPAQ SURVEY SCREEN -->
-  <div id="surveyScreen" class="screen">
-    <h2>📋 日常身體活動小調查</h2>
-    <p class="subtitle">回答以下7題，了解你的活動狀況<br>（改編自國際身體活動量表短版 IPAQ-SF）</p>
+<!-- SURVEY -->
+<div id="surveyScreen" class="screen">
+<h2>📋 日常身體活動小調查</h2>
+<p class="subtitle">回答以下 4 題，了解你的活動狀況<br>（改編自國際身體活動量表短版 IPAQ-SF）</p>
+<div class="survey-q">
+<div class="q-title">1. 過去7天，你有幾天做「會喘到難聊天」的高強度活動？</div><label>（如跑步、球類競賽、搬重物上樓）</label>
+<div class="survey-row"><div class="survey-field"><span>天數/週</span><input type="number" id="vpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div><div class="survey-field"><span>每天幾分鐘</span><input type="number" id="vpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div></div>
+</div>
+<div class="survey-q">
+<div class="q-title">2. 過去7天，你有幾天做「有點喘但能聊天」的中等強度活動？</div><label>（如快走、騎車通勤、打掃）</label>
+<div class="survey-row"><div class="survey-field"><span>天數/週</span><input type="number" id="mpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div><div class="survey-field"><span>每天幾分鐘</span><input type="number" id="mpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div></div>
+</div>
+<div class="survey-q">
+<div class="q-title">3. 過去7天，你有幾天走路至少10分鐘？</div><label>（含通勤、逛街、遛狗）</label>
+<div class="survey-row"><div class="survey-field"><span>天數/週</span><input type="number" id="walkDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div><div class="survey-field"><span>每天幾分鐘</span><input type="number" id="walkMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div></div>
+</div>
+<div class="survey-q">
+<div class="q-title">4. 過去7天，平日一天大約坐著多久？</div><label>（含工作、通勤、看電視、用電腦）</label>
+<div class="survey-field"><span>小時/天</span><input type="number" id="sitHours" min="0" max="24" value="0" onchange="updateSurveyPreview()"></div>
+</div>
+<div class="ai-panel" id="surveyPreview" style="display:none"><h3>📊 預估</h3><div class="ai-content" id="surveyPreviewText"></div></div>
+<button class="btn btn-primary" onclick="startGame()">開始答題 🎯</button>
+<button class="btn btn-secondary" onclick="skipSurvey()">跳過調查</button>
+</div>
 
-    <div class="survey-q">
-      <div class="q-title">1. 過去7天，你有幾天做「高強度」身體活動？</div>
-      <label>（如跑步、快速騎車、搬重物、球類競賽—會讓你呼吸明顯急促）</label>
-      <div class="survey-row">
-        <div class="survey-field"><span>天數/週</span><input type="number" id="vpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
-        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="vpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
-      </div>
-    </div>
+<!-- GAME -->
+<div id="gameScreen" class="screen">
+<div class="score-display"><span>👤 <b id="displayName"></b></span><span>⭐ <b id="currentScore">0</b></span><span>⏱ <b id="currentTimer">00:00</b></span></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+<div class="q-num" id="qNum"></div>
+<div class="q-text" id="qText"></div>
+<div class="options" id="opts"></div>
+<div class="feedback" id="fb"></div>
+<div class="feedback-detail" id="fbDetail"></div>
+</div>
 
-    <div class="survey-q">
-      <div class="q-title">2. 過去7天，你有幾天做「中等強度」身體活動？</div>
-      <label>（如快走、騎車通勤、打掃、搬輕物—會讓你呼吸稍快）</label>
-      <div class="survey-row">
-        <div class="survey-field"><span>天數/週</span><input type="number" id="mpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
-        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="mpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
-      </div>
-    </div>
+<!-- RESULT -->
+<div id="resultScreen" class="screen">
+<div class="result-icon" id="resultIcon">🏆</div>
+<h1 id="resultTitle">挑戰完成！</h1>
+<div class="result-score" id="resultScore">0</div>
+<div class="result-detail" id="resultDetail"></div>
+<div class="ipa-feedback-card" id="ipaFeedback"></div>
+<div class="leaderboard"><h3>🏅 排行榜 TOP 10</h3><div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div></div>
 
-    <div class="survey-q">
-      <div class="q-title">3. 過去7天，你有幾天「走路」至少10分鐘？</div>
-      <label>（含通勤、逛街、遛狗等任何走路）</label>
-      <div class="survey-row">
-        <div class="survey-field"><span>天數/週</span><input type="number" id="walkDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
-        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="walkMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
-      </div>
-    </div>
+<!-- MOVE GAME - embedded directly in result page -->
+<div class="move-section" id="moveSection">
+<div class="move-header" onclick="toggleMoveGame()">
+<h3>🦵 起來動一動！</h3>
+<div class="hint">點擊展開 → 跟著畫面做簡單的跳躍和深蹲</div>
+</div>
+<div class="move-body" id="moveBody">
+<div class="move-phase" id="movePhase">準備開始...</div>
+<div class="move-count" id="moveCount"></div>
+<div class="move-instruction" id="moveInstruction">點下方按鈕開始</div>
+<div class="move-legend"><span><span class="move-dot" style="background:#ff4757"></span>🔴雙腳跳</span><span><span class="move-dot" style="background:#3742fa"></span>🔵深蹲</span><span><span class="move-dot" style="background:#555"></span>⬛不動</span></div>
+<div class="move-square gray" id="moveSquare">🦵</div>
+<div class="move-progress"><div class="move-progress-fill" id="moveProgressFill" style="width:0%"></div></div>
+<div class="move-done" id="moveDone"><div class="icon">🎉</div><div class="msg">太棒了！</div><div class="sub">完成了 25 次反應運動！研究說短時間穿插活動就能促進健康。每天找空檔動一動，身體感謝你 💪</div></div>
+<button class="btn btn-primary" id="moveStartBtn" onclick="launchMoveGame()" style="background:linear-gradient(135deg,#ff4757,#ff6b81)">🔥 開始動一動！</button>
+<button class="btn btn-secondary" id="moveRetryBtn" style="display:none" onclick="launchMoveGame()">再來一次 🔄</button>
+</div>
+</div>
 
-    <div class="survey-q">
-      <div class="q-title">4. 過去7天，平日一天你大約「坐著」多少時間？</div>
-      <label>（含工作、通勤、看電視、用電腦等）</label>
-      <div class="survey-field"><span>小時/天</span><input type="number" id="sitHours" min="0" max="24" value="0" onchange="updateSurveyPreview()"></div>
-    </div>
-
-    <div class="ai-panel" id="surveyPreview" style="display:none">
-      <h3>📊 預估</h3>
-      <div class="ai-content" id="surveyPreviewText"></div>
-    </div>
-
-    <button class="btn btn-primary" onclick="startGame()">開始答題 🎯</button>
-    <button class="btn btn-secondary" onclick="skipSurvey()">跳過調查，直接挑戰</button>
-  </div>
-
-  <!-- GAME SCREEN -->
-  <div id="gameScreen" class="screen">
-    <div class="score-display">
-      <span>👤 <span id="displayName"></span></span>
-      <span>⭐ <span id="currentScore">0</span> 分</span>
-      <span>⏱ <span id="currentTimer">00:00</span></span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="question-number" id="questionNumber"></div>
-    <div class="question-text" id="questionText"></div>
-    <div class="options" id="optionsContainer"></div>
-    <div class="feedback" id="feedback"></div>
-  </div>
-
-  <!-- RESULT SCREEN -->
-  <div id="resultScreen" class="screen">
-    <div class="result-icon" id="resultIcon">🏆</div>
-    <h1 id="resultTitle">挑戰完成！</h1>
-    <div class="result-score" id="resultScore">0</div>
-    <div class="result-detail" id="resultDetail"></div>
-    <div class="ipa-feedback-card" id="ipaFeedback"></div>
-    <div class="leaderboard">
-      <h3>🏅 排行榜 TOP 10</h3>
-      <div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div>
-    </div>
-    <div style="background:linear-gradient(135deg,rgba(255,71,87,0.15),rgba(55,66,250,0.15));border-radius:14px;padding:16px;margin:16px 0;text-align:center;border:2px dashed rgba(255,71,87,0.3);">
-      <div style="font-size:20px;font-weight:800;color:#ff6b81;margin-bottom:4px;">🦵 起來動一動！</div>
-      <div style="font-size:12px;color:#a0b8c8;margin-bottom:10px;">跟著畫面做簡單的跳躍和深蹲，25 次就完成！</div>
-      <button class="btn btn-primary" onclick="startMoveGame()" style="background:linear-gradient(135deg,#ff4757,#ff6b81);font-size:20px;padding:16px;box-shadow:0 8px 30px rgba(255,71,87,0.4);animation:pulseBtn 2s infinite;">🔥 開始動一動！</button>
-    </div>
-    <button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
-    <button class="btn btn-secondary" onclick="shareResult()">分享結果 📤</button>
-    <button class="btn btn-secondary" onclick="openAICoach()" style="background:linear-gradient(135deg,#614385,#516395);color:#fff;">🤖 AI 知識教練</button>
-    <div class="ai-panel" id="aiAnalysis" style="display:none">
-      <h3>🤖 AI 個人化運動分析</h3>
-      <div class="ai-content" id="aiAnalysisContent"><span class="ai-typing">分析中...</span></div>
-    </div>
-    <div class="small" style="margin-top:20px">資料儲存於 Supabase · AI分析由 Groq 提供</div>
-  </div>
-
-  <!-- MOVE GAME SCREEN -->
-  <div id="moveScreen" class="screen" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:150;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);overflow-y:auto;padding:20px;">
-    <div class="container" style="margin:20px auto;max-width:500px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border-radius:24px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
-    <div class="move-container">
-      <div class="move-phase" id="movePhase"></div>
-      <div class="move-count" id="moveCount"></div>
-      <div class="move-instruction" id="moveInstruction"></div>
-      <div class="move-legend">
-        <span><span class="dot" style="background:#ff4757"></span> 🔴 雙腳跳</span>
-        <span><span class="dot" style="background:#3742fa"></span> 🔵 深蹲</span>
-        <span><span class="dot" style="background:#555"></span> ⬛ 不動</span>
-      </div>
-      <div class="move-square" id="moveSquare"></div>
-      <div class="move-progress"><div class="move-progress-fill" id="moveProgressFill" style="width:0%"></div></div>
-      <div class="move-result" id="moveResult" style="display:none"></div>
-      <div class="move-complete-msg" id="moveCompleteMsg" style="display:none"></div>
-      <button class="btn btn-primary" id="moveBackBtn" style="display:none" onclick="backToResult()">回到結果 🔙</button>
-    </div>
-    </div>
-  </div>
+<button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
+<button class="btn btn-secondary" onclick="shareResult()">分享結果 📤</button>
+<button class="btn btn-secondary" onclick="openAICoach()" style="background:linear-gradient(135deg,#614385,#516395);color:#fff">🤖 AI 知識教練</button>
+<div class="ai-panel" id="aiAnalysis" style="display:none"><h3>🤖 AI 個人化運動分析</h3><div class="ai-content" id="aiAnalysisContent"><span class="ai-typing">分析中...</span></div></div>
+<div class="small">資料儲存於 Supabase · AI 分析由 Groq 提供</div>
+</div>
 
 </div>
 
-<!-- AI CHAT MODAL -->
-<div id="chatModal" class="chat-modal" style="display:none" onclick="if(event.target===this)closeAICoach()">
-  <div class="chat-box">
-    <div class="chat-header">
-      <span>🤖 AI 運動知識教練</span>
-      <button class="chat-close" onclick="closeAICoach()">✕</button>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-msg ai">哈囉！我是你的AI運動知識教練。你可以問我任何關於身體活動、目標設定、運動強度、自我效能等相關問題喔！💪</div>
-    </div>
-    <div class="chat-input-row">
-      <input type="text" id="chatInput" placeholder="問我任何身體活動的問題..." onkeydown="if(event.key==='Enter')sendChat()">
-      <button onclick="sendChat()">發送</button>
-    </div>
-  </div>
+<!-- CHAT MODAL -->
+<div class="chat-modal" id="chatModal" onclick="if(event.target===this)closeAICoach()">
+<div class="chat-box">
+<div class="chat-header"><span>🤖 AI 運動知識教練</span><button class="chat-close" onclick="closeAICoach()">✕</button></div>
+<div class="chat-messages" id="chatMessages"><div class="chat-msg ai">哈囉！我是你的 AI 運動知識教練。問我任何身體活動、目標設定、運動強度的問題吧 💪</div></div>
+<div class="chat-input-row"><input type="text" id="chatInput" placeholder="問我身體活動的問題..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">發送</button></div>
+</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ====== BACKGROUND MUSIC ======
-let musicPlaying = false;
-let ytPlayer = null;
-const YT_VIDEO_ID = 'lSREjKXGbGA';
+// CONFIG
+const SUPA_URL='https://kkqsqlwlxeffdoondlcj.supabase.co';
+const SUPA_KEY='sb_publishable_sQHqEZIyL2fqAnyxpPwVqA_H5T2n2kb';
+const YT_ID='lSREjKXGbGA';
+let supabase=null;try{if(window.supabase)supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}
 
-function toggleMusic() {
-  const btn = document.getElementById('musicBtn');
-  if (!musicPlaying) {
-    if (!ytPlayer) {
-      document.getElementById('ytBgMusic').src =
-        `https://www.youtube.com/embed/${YT_VIDEO_ID}?autoplay=1&loop=1&playlist=${YT_VIDEO_ID}&controls=0&showinfo=0&rel=0&mute=0`;
-    } else {
-      document.getElementById('ytBgMusic').contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    }
-    btn.textContent = '🔊';
-    musicPlaying = true;
-  } else {
-    if (ytPlayer || document.getElementById('ytBgMusic').src) {
-      document.getElementById('ytBgMusic').contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-    }
-    btn.textContent = '🔇';
-    musicPlaying = false;
-  }
-}
+// MUSIC
+let musicOn=false;
+function toggleMusic(){musicOn=!musicOn;document.getElementById('mBtn').textContent=musicOn?'🔊':'🔇';const f=document.getElementById('ytBg');if(musicOn){if(!f.src)f.src='https://www.youtube.com/embed/'+YT_ID+'?autoplay=1&loop=1&playlist='+YT_ID+'&controls=0&showinfo=0';else f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}','*')}else{if(f.src)f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*')}}
+document.addEventListener('click',function x(){document.getElementById('musicBtn').style.display='block'},{once:true});
 
-// Show music button after first user interaction
-document.addEventListener('click', function initMusic() {
-  document.getElementById('musicPlayer').style.display = 'block';
-}, { once: true });
-
-// ====== SUPABASE INIT (non-blocking) ======
-const SUPABASE_URL = 'https://kkqsqlwlxeffdoondlcj.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_sQHqEZIyL2fqAnyxpPwVqA_H5T2n2kb';
-let supabase = null;
-
-(function loadSupabase() {
-  var s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  s.onload = function() {
-    try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
-    catch(e) { console.warn('Supabase init:', e); }
-  };
-  s.onerror = function() {
-    var s2 = document.createElement('script');
-    s2.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    s2.onload = function() {
-      try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
-      catch(e) { console.warn('Supabase init fallback:', e); }
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s);
-})();
-
-// ====== QUESTION BANK ======
-const QUESTION_BANK = [
-  {
-    q: '🌍 全球每 100 個成年人裡，大約有幾個人「動不夠」？',
-    opts: ['15 人', '31 人', '50 人', '70 人'],
-    ans: 1,
-    exp: 'WHO 統計全球約 31% 的成年人沒達到建議活動量——換句話說，你身邊每 3 個人就有 1 個動太少。你不是一個人！'
-  },
-  {
-    q: '⚡ 你知道嗎？「衝刺爬 1 分鐘樓梯」的健康效果，大概等於「慢慢走」多久？',
-    opts: ['2 分鐘', '4 分鐘', '10 分鐘', '20 分鐘'],
-    ans: 1,
-    exp: '科學家追蹤 7 萬多人發現：1 分鐘高強度運動的健康效益 ≈ 4 分鐘中等強度！所以「短時間衝一下」真的很划算。'
-  },
-  {
-    q: '🎯 設定運動目標時，SMART 的「S」是指什麼？',
-    opts: ['簡單就好', '具體明確', '跟別人比', '憑感覺'],
-    ans: 1,
-    exp: 'S = Specific（具體）。例如「每天午餐後散步 15 分鐘」就比「我要多走路」更清楚、更容易做到！'
-  },
-  {
-    q: '🏁 如果你平常不太運動，哪種設定目標的方式最不容易放棄？',
-    opts: ['每天跑 5 公里', '這週學 3 種增加步數的方法', '一個月瘦 10 公斤', '不用設目標，憑感覺'],
-    ans: 1,
-    exp: '研究發現：對運動新手來說，「學習型目標」比「數字型目標」更有效！重點是學怎麼做，而不是逼自己達標。'
-  },
-  {
-    q: '😤 為什麼全力衝刺跑步沒多久就想停下來？',
-    opts: ['單純體力不夠', '身體的求救訊號壓過意志力', '跑步太無聊', '鞋子不好穿'],
-    ans: 1,
-    exp: '科學上有個「雙模理論」：運動強度超過某個門檻後，身體的不舒服訊號會「蓋過」你的意志力。所以不用怪自己！'
-  },
-  {
-    q: '🤔 運動到「開始有點喘但還能講話」的程度，是好事還是壞事？',
-    opts: ['代表快不行了，趕快停', '代表進入中等強度，對健康很好', '代表強度不夠，沒有效果', '代表姿勢不對'],
-    ans: 1,
-    exp: '「有點喘但還能聊天」就是傳說中的中等強度！這個強度對心血管最好，也不會讓你想放棄。'
-  },
-  {
-    q: '💪 以下哪種運動方式，會讓人「做完心情最好」？',
-    opts: ['30 分鐘慢慢走', '連續跑 30 分鐘', '10 分鐘內穿插短衝刺', '躺著不動'],
-    ans: 2,
-    exp: '科學實驗發現：10 分鐘的「短衝刺＋休息」模式，做完後的心情跟慢慢走一樣好，72% 的人更喜歡這種方式！'
-  },
-  {
-    q: '🌟 為什麼「成功一次之後，下次會更有動力」是真的？',
-    opts: ['只是心靈雞湯', '科學證實：自己做到過的經驗最有效', '因為別人在看你', '純粹運氣好'],
-    ans: 1,
-    exp: '心理學家 Bandura 發現：「自己成功過的經驗」是建立信心最強的方式！所以先設小目標、累積小成功，比逼自己更有效。'
-  },
-  {
-    q: '🔑 以下哪個方法最能幫助你「持續運動不中斷」？',
-    opts: ['找朋友每天督促你', '先從超簡單的小目標開始，做到就記錄', '買最貴的健身房會員', '每天照鏡子激勵自己'],
-    ans: 1,
-    exp: '研究發現：自我監控（記錄自己的活動）是最有效的技巧！下載個計步 APP 或用手機記錄，效果比別人督促還好。'
-  },
-  {
-    q: '👣 台灣人平均一天走幾步？',
-    opts: ['3,000 步', '5,000 步', '8,000 步', '10,000 步'],
-    ans: 1,
-    exp: '台灣人平均每天約 5,000 步，距離建議的 7,000-8,000 步還差一小段。好消息是：每天多走 2,000 步就有明顯健康改善！'
-  },
-  {
-    q: '📈 一天至少走幾步，健康就會開始明顯變好？',
-    opts: ['3,000 步', '5,000 步', '8,000 步', '12,000 步'],
-    ans: 1,
-    exp: '研究分析 47,000 人發現：每天 5,000 步就是健康改善的起點！到 8,000-10,000 步效果最好。不用追求 10,000 步神話。'
-  },
-  {
-    q: '🧠 不運動的人，除了身材走樣，最該擔心什麼？',
-    opts: ['只有心臟病', '只有變胖', '慢性病＋大腦退化風險同時升高', '沒事，不用擔心'],
-    ans: 2,
-    exp: '身體活動不足不只影響身材！它會同時提高心臟病、糖尿病和失智症的風險。反過來說，多動就能同時保護身體和大腦。'
-  },
-  {
-    q: '🔄 為什麼有些人越運動越開心，形成好循環？',
-    opts: ['只是自我安慰', '運動中的好心情→會讓你下次更想動→動了又開心', '他們本來就比較快樂', '因為有朋友一起'],
-    ans: 1,
-    exp: '科學家稱這叫「向上螺旋」：運動當下的愉悅感→建立身心資源→下次運動更有動力。所以重點不是「撐完」，而是「享受過程」！'
-  },
-  {
-    q: '⚠️ 上班日多走了一些路，回家後會發生什麼事？',
-    opts: ['回家會更累、動更少（補償效應）', '回家反而更有精神繼續動', '完全沒影響', '會睡不著'],
-    ans: 1,
-    exp: '研究發現「輕度活動」有補償效應——白天多站多走，晚上反而更想躺著。但「中高強度活動」沒有這個問題！所以重點是強度。'
-  },
-  {
-    q: '⏰ 對於幾乎不運動的人，每天只需要多做多久的活動，就能看到健康改善？',
-    opts: ['1 分鐘', '5 分鐘', '30 分鐘', '1 小時'],
-    ans: 1,
-    exp: '對活動量最少的人來說，每天只要多動 5 分鐘（真的只有 5 分鐘！），就能降低 6% 的死亡風險。小改變，大效果。'
-  },
-  {
-    q: '📱 想讓自己動起來，哪種方法被證實最有效？',
-    opts: ['設定超高目標激勵自己', '每天記錄走了幾步、動了多久', '找朋友一起報名比賽', '獎勵自己吃大餐'],
-    ans: 1,
-    exp: '自我監控（用 APP 或手錶記錄每日步數和活動）被證實是單一最有效的技巧。看見自己的進步，是最強的動力！'
-  },
-  {
-    q: '🏃 「沒時間運動」的上班族，科學家推薦什麼策略？',
-    opts: ['週末一次補齊', '每天穿插 3 次、每次 1-2 分鐘的快走或爬樓梯', '放棄治療', '請假去運動'],
-    ans: 1,
-    exp: 'VILPA（生活化高強度片段活動）：每天只要有 3 次、每次 1-2 分鐘的衝刺級活動（快走爬樓梯、追上公車），就能降低近 40% 的死亡風險！'
-  },
-  {
-    q: '❌ 為什麼很多人設「每天跑 5 公里」的目標，最後都失敗了？',
-    opts: ['目標太具體反而壓力大', '這種目標對新手來說太難、產生挫折感', '跑步太無聊', '沒有買新跑鞋'],
-    ans: 1,
-    exp: '研究發現：對平常不運動的人，太具體的大目標反而造成壓力和焦慮，降低樂趣，最終乾脆放棄。先學「怎麼開始」比「衝到終點」更重要。'
-  },
-  {
-    q: '💡 「覺得自己做得到」的信心，在運動裡最主要的影響是什麼？',
-    opts: ['影響今天穿什麼', '影響你會不會開始動、以及能堅持多久', '影響會瘦幾公斤', '影響跑多快'],
-    ans: 1,
-    exp: '自我效能（覺得自己能做到的信心）是預測一個人會不會持續運動最準的指標！比意志力、比動機都準。所以先建立信心最重要。'
-  },
-  {
-    q: '🎉 以下哪句話最符合運動科學的建議？',
-    opts: ['沒有痛苦，就沒有效果', '找到讓你享受的方式，比硬撐更重要', '每天都要運動 1 小時才有效', '不動也沒關係'],
-    ans: 1,
-    exp: '科學證明：運動中的「好心情」才是長期堅持的關鍵！與其咬牙硬撐，不如找到你喜歡的動法——散步、跳舞、騎車都算。享受，才能持久。'
-  }
+// QUESTIONS - with detailed explanations + sources
+const Q=[
+{q:'🌍 全球每 100 個成年人，大約幾個人「動不夠」？',o:['15 人','31 人','50 人','70 人'],a:1,d:'根據 WHO 2022 年全球統計，約 31% 成年人未達建議身體活動量（Strain et al., 2024, Lancet Global Health）。台灣 40-64 歲中年族群的規律運動比例更是所有年齡層中最低的。換句話說，你身邊每 3 個人就有 1 個動太少——你不是一個人！',s:'Strain et al. (2024) Lancet Global Health'},
+{q:'⚡「衝刺爬 1 分鐘樓梯」的效果，大概等於「慢慢走」多久？',o:['2 分鐘','4 分鐘','10 分鐘','20 分鐘'],a:1,d:'Biswas 等人追蹤 UK Biobank 73,485 人發現：1 分鐘高強度活動（VPA）的健康效益 ≈ 4.1 分鐘中等強度活動（MPA）；若跟輕度活動比，更是 1:53 的差距。傳統「1:2」換算嚴重低估高強度的價值，短時間衝一下真的很划算！',s:'Biswas et al. (2025) Nature Communications'},
+{q:'🎯 SMART 目標的「S」是什麼意思？',o:['簡單就好','具體明確','跟別人比','憑感覺'],a:1,d:'SMART 原則：Specific（具體）、Measurable（可測量）、Action-oriented（行動導向）、Realistic（實際可達成）、Timely（有時限）。例如「每天午餐後散步 15 分鐘」比「我要多走路」更清楚、更容易做到。但研究也發現：對平常不運動的人，太具體的數字目標反而造成壓力（Hawkins et al., 2024）。',s:'Hawkins et al. (2024) Research Quarterly for Exercise and Sport'},
+{q:'🏁 對運動新手來說，哪種目標設定最不容易放棄？',o:['每天跑 5 公里','學 3 種增加步數的方法','一個月瘦 10 公斤','不用設目標'],a:1,d:'Seijts & Latham（2005）提出「學習型目標」：當任務複雜、你還沒掌握技巧時，專注於「學怎麼做」比「衝數字」更有效。例如「這週學兩種利用零碎時間增加步數的方法」優於「每天走 10,000 步」。Carter 等人（2021）的實驗也證實學習型目標的自我效能和達成率都優於 SMART。',s:'Seijts & Latham (2005) Academy of Management Perspectives; Carter et al. (2021) Int J Sport Psychol'},
+{q:'😤 為什麼全力衝刺沒多久就想停？',o:['體力不夠','身體的不舒服訊號壓過意志力','太無聊','鞋子不好'],a:1,d:'Ekkekakis（2003）提出「雙模理論」：低強度時，心情由想法主導（「我可以！」）；超過換氣閾值後，身體的內感受訊號（喘、痠）會壓過認知控制。這就是為什麼硬撐的運動讓人想放棄——不是意志力差，是生理機制使然。了解這點，就知道「找到舒服的強度」比「硬撐」更重要。',s:'Ekkekakis (2003) Cognition and Emotion'},
+{q:'🤔 運動到「有點喘但還能聊天」，對健康是好是壞？',o:['快不行了','剛好是中等強度，對健康最好','強度不夠','姿勢不對'],a:1,d:'「有點喘但能聊天」就是中等強度（MPA）的黃金標準。WHO 建議每週 150-300 分鐘 MPA，或 75-150 分鐘高強度。這個強度對心血管最好，也不會讓你產生排斥感。Stevens 等人（2020）指出：運動中的情緒反應是預測你能不能長期堅持的最強指標，所以「舒服的強度」比「最猛的強度」更重要。',s:'WHO (2020); Stevens et al. (2020) Frontiers in Psychology'},
+{q:'💪 下列哪種運動方式，做完心情最好？',o:['30 分鐘慢慢走','連續跑 30 分鐘','10 分鐘穿插短衝刺','躺著不動'],a:2,d:'Kinghorn 等人（2026）比較了 5 種運動模式：30 分鐘中等、30 分鐘高強度、10 分鐘短時高效高強度（REHIT）等。結果 REHIT（10 分鐘含 2×20 秒衝刺）的情感下降量跟中等強度一樣少，但時間只有 1/3！72% 的人更喜歡這種模式。關鍵不是「強度多高」，而是「不舒服的時間多長」。',s:'Kinghorn et al. (2026) J Sport Exerc Psychol'},
+{q:'🌟 為什麼「成功一次後更有動力」有科學根據？',o:['心靈雞湯','自己做到過的經驗最能建立信心','別人在看','運氣'],a:1,d:'Bandura（1977）的自我效能理論指出：提升信心的四大來源中，「精熟經驗」（自己成功完成）是最強的一個（r=.83）。所以先設定小目標、累積小成功，比別人鼓勵或看別人成功都更有效。McAuley 等人（2011）進一步證實：自我效能是一個人會不會持續運動最準的預測因子，勝過動機和意志力。',s:'Bandura (1977) Psychological Review; McAuley et al. (2011) Am J Lifestyle Med'},
+{q:'🔑 哪個方法最能幫你「持續運動不中斷」？',o:['找朋友督促','從超簡單的小目標開始 + 記錄','買最貴的健身房會員','照鏡子激勵'],a:1,d:'Williams & French（2011）的統合分析發現：自我監控（記錄自己的活動）是單一最有效的行為改變技術（d=0.43），比目標設定、社會支持都強。下載計步 APP 或用手機記錄每日步數，看見自己的進步就是最強的動力。目標設定＋自我監控一起用，效果還會更大。',s:'Williams & French (2011) Health Psychology'},
+{q:'👣 台灣人平均一天走幾步？',o:['3,000 步','5,000 步','8,000 步','10,000 步'],a:1,d:'根據 Althoff 等人（2017）利用手機數據分析 111 國，台灣人平均每日約 5,000 步，距離成年人建議的每日 7,000-8,000 步還差一小段。好消息是：不用追求「10,000 步神話」——Paluch 等人（2022）的統合分析（47,471 人）發現，每日 5,000 步就是健康改善的起點。',s:'Althoff et al. (2017) Nature; Paluch et al. (2022) Lancet Public Health'},
+{q:'📈 一天走幾步，健康就開始明顯變好？',o:['3,000 步','5,000 步','8,000 步','12,000 步'],a:1,d:'Paluch 等人（2022）統合 15 個國際世代、共 47,471 人的資料發現：60 歲以下成人每天 5,000 步就能顯著降低全因死亡風險；效益約在 8,000-10,000 步達到高原。重點是「有動就有效」——不用執著 10,000 步，每天多走 2,000 步就有明顯改善。',s:'Paluch et al. (2022) Lancet Public Health'},
+{q:'🧠 不運動的人，最該擔心什麼？',o:['只有心臟病','只有變胖','慢性病＋大腦退化同時升高','沒事'],a:2,d:'研究一致顯示：身體活動不足不只跟心臟病、糖尿病有關，更顯著提高失智症風險。Sofi 等人（2011）的統合分析發現：高活動量者認知衰退風險降低 38%。Livingston 等人（2024）在 Lancet 的失智症預防報告中也將「缺乏身體活動」列為關鍵可改變風險因子。',s:'Sofi et al. (2011) J Intern Med; Livingston et al. (2024) Lancet'},
+{q:'🔄 為什麼越運動越開心？',o:['自我安慰','運動好心情→下次更想動→更開心','本來就快樂','有朋友'],a:1,d:'Cappellen 等人（2019）提出「向上螺旋理論」：運動中的正向情感會建構你的生理、認知、心理資源（如體力變好、更有自信），這些資源又讓你下次運動時更容易感到愉悅，形成正向循環。關鍵啟示：運動的重點不是「撐完」，而是「享受過程」——享受了，自然就會持續。',s:'Cappellen et al. (2019) Psychology & Health'},
+{q:'⚠️ 上班日多走了路，回家會更累不想動嗎？',o:['會（補償效應）','不會，反而更有精神','沒影響','會睡不著'],a:0,d:'Gay 等人（2017）以加速度規追蹤 445 名上班族發現：輕度活動（LPA）存在「補償效應」——白天多站多走，晚上反而更想躺著（r=-0.38）。但有趣的是，中高強度活動（MVPA）反而有「放大效應」（r=0.17）：做中高強度運動的人，下班後反而更有動力繼續動！所以強度才是關鍵。',s:'Gay et al. (2017) Preventive Medicine'},
+{q:'⏰ 對幾乎不運動的人，每天多動多久就有健康改善？',o:['1 分鐘','5 分鐘','30 分鐘','1 小時'],a:1,d:'Ekelund 等人（2026）的大型統合分析發現：在活動量最少的 20% 人群中，每天僅增加 5 分鐘中高強度活動（MVPA），就能預防 6% 的死亡。Saint-Maurice 等人（2022）也發現：即使每天只增加 10 分鐘 MVPA，都能顯著降低死亡風險。真的只要 5 分鐘，小改變就有大效果！',s:'Ekelund et al. (2026); Saint-Maurice et al. (2022) JAMA Intern Med'},
+{q:'📱 讓自己動起來，哪招最有效？',o:['設超高目標','每天記錄走了幾步','找朋友比賽','獎勵吃大餐'],a:1,d:'如前所述，自我監控是單一最強的行為改變技巧。Michie 等人（2013）建立了 93 種行為改變技術（BCT）的標準分類，其中「1.4 行動計畫」＋「2.3 自我監控」是促進身體活動最常被驗證有效的組合。手機內建計步器就是最方便的自我監控工具。',s:'Michie et al. (2013) Ann Behav Med'},
+{q:'🏃「沒時間運動」的上班族，科學家推薦怎麼做？',o:['週末一次補齊','每天穿插 3 次、每次 1-2 分鐘衝刺活動','放棄','請假'],a:1,d:'Stamatakis 等人（2022）在 Nature Medicine 發表了「VILPA」概念：日常生活中穿插的極短高強度活動（如快走爬樓梯、追上公車）——每天只要 3 次、每次 1-2 分鐘，全因死亡風險就能降 38-40%，心血管死亡降 48-49%！VILPA 的效果曲線跟規律運動者幾乎一樣，對不運動的上班族是革命性的發現。',s:'Stamatakis et al. (2022) Nature Medicine'},
+{q:'❌ 為什麼很多人設「每天跑 5 公里」最後都失敗？',o:['太具體壓力大','對新手太難、挫折感太重','太無聊','沒買新鞋'],a:1,d:'Hawkins 等人（2024）發現：對身體活動不足者，太具體且有挑戰性的 SMART 目標反而增加壓力與焦慮，降低運動過程中的樂趣和自我效能。當自覺難以達標時，滿足感降低，最終乾脆放棄（Swann et al., 2023）。對新手來說，先學「怎麼開始」比「衝到終點」更重要。',s:'Hawkins et al. (2024); Swann et al. (2023) Health Psychol Rev'},
+{q:'💡「覺得自己做得到」的信心，對運動的影響有多大？',o:['影響穿著','預測會不會開始動、能堅持多久','影響瘦幾公斤','影響跑多快'],a:1,d:'McAuley 等人（2011）的長期追蹤發現：自我效能是預測運動開始與長期維持「最一致」的因子，即使控制過去的運動量之後仍然顯著。Baghbani 等人（2023）的統合分析顯示運動介入可提升自我效能（SMD=0.536）。結論：建立信心比給自己壓力更有效。',s:'McAuley et al. (2011); Baghbani et al. (2023)'},
+{q:'🎉 哪句話最符合運動科學的建議？',o:['沒有痛苦就沒有效果','找到讓你享受的方式比硬撐更重要','每天運動 1 小時才有效','不動也沒關係'],a:1,d:'Rhodes & Kates（2015）系統回顧 24 篇研究發現：運動「當下」的情感反應是預測未來行為的最強因子，勝過態度、意圖和自我效能。Cappellen 的向上螺旋理論也說明：享受 → 持續 → 更享受。所以最重要的不是你動了多少，而是你會不會想再動一次。找到你喜歡的方式——散步、跳舞、騎車——享受才能持久。',s:'Rhodes & Kates (2015) Ann Behav Med'}
 ];
 
-// ====== GAME STATE ======
-let playerName = '';
-let questions = [];
-let currentQ = 0;
-let score = 0;
-let correctCount = 0;
-let startTime = 0;
-let timerInterval = null;
-let gameActive = false;
-let wrongQuestions = [];
-let aiChatHistory = [];
-let ipaqData = null; // { vpaDays, vpaMins, mpaDays, mpaMins, walkDays, walkMins, sitHours }
+// STATE
+let name='',qs=[],qi=0,sc=0,cc=0,st=0,ti=null,ga=null,wr=[],ip=null,mt=null,mi=0,mp=0,ms=[],mph=0;
 
-// ====== HELPERS ======
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function $(id){return document.getElementById(id)}
+function ss(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function sh(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function ft(s){const m=Math.floor(s/60),se=s%60;return String(m).padStart(2,'0')+':'+String(se).padStart(2,'0')}
+
+// START FLOW
+function goToSurvey(){name=$('playerName').value.trim();if(!name){$('playerName').focus();$('playerName').style.borderColor='#ff4757';return}$('playerName').style.borderColor='';ss('surveyScreen')}
+function skipSurvey(){ip=null;launchQuiz()}
+function updateSurveyPreview(){const d=readIpaq();if(!d)return;const met=calcMET(d);const lv=getLevel(met,d);const p=$('surveyPreview'),t=$('surveyPreviewText');if(met===0){p.style.display='none';return}p.style.display='block';t.textContent=`總活動量約 ${met} MET-分鐘/週 → ${lv==='high'?'🏃高度活躍':lv==='moderate'?'🚶中度活躍':'🪑低度活躍'}｜每日久坐約 ${d.sitHours} 小時`}
+function readIpaq(){return{vpaDays:+$('vpaDays').value||0,vpaMins:+$('vpaMins').value||0,mpaDays:+$('mpaDays').value||0,mpaMins:+$('mpaMins').value||0,walkDays:+$('walkDays').value||0,walkMins:+$('walkMins').value||0,sitHours:+$('sitHours').value||0}}
+function calcMET(d){return Math.round(3.3*d.walkMins*d.walkDays+4.0*d.mpaMins*d.mpaDays+8.0*d.vpaMins*d.vpaDays)}
+function getLevel(tm,d){const vok=d.vpaDays>=3&&d.vpaMins>=20,mok=(d.mpaDays+d.walkDays)>=5&&((d.mpaMins*d.mpaDays+d.walkMins*d.walkDays)/Math.max(1,d.mpaDays+d.walkDays))>=30,cok=tm>=600;if((d.vpaDays>=3&&tm>=1500)||((d.vpaDays+d.mpaDays+d.walkDays)>=7&&tm>=3000))return'high';if(vok||mok||cok)return'moderate';return'low'}
+
+function startGame(){ip=readIpaq();launchQuiz()}
+function launchQuiz(){
+  qs=sh(Q).slice(0,10);qi=0;sc=0;cc=0;wr=[];ga=true;
+  $('displayName').textContent=name;$('currentScore').textContent='0';$('currentTimer').textContent='00:00';$('progressFill').style.width='0%';$('fb').classList.remove('show','correct-fb','wrong-fb');$('fbDetail').classList.remove('show');
+  ss('gameScreen');st=Date.now();ti=setInterval(()=>{if(!ga)return;$('currentTimer').textContent=ft(Math.floor((Date.now()-st)/1000))},1000);loadQ()
+}
+function loadQ(){if(qi>=qs.length){endGame();return}const q=qs[qi];$('qNum').textContent=`第 ${qi+1} / ${qs.length} 題`;$('qText').textContent=q.q;$('progressFill').style.width=(qi/qs.length*100)+'%';$('fb').classList.remove('show','correct-fb','wrong-fb');$('fbDetail').classList.remove('show');const c=$('opts');c.innerHTML='';q.o.forEach((o,i)=>{const d=document.createElement('div');d.className='option';d.textContent=o;d.onclick=()=>answer(i);c.appendChild(d)})}
+function answer(ch){
+  if(!ga)return;ga=false;const q=qs[qi];
+  const ops=document.querySelectorAll('.option');const sb=Math.max(0,15-Math.floor((Date.now()-st)/1000/qi));
+  ops.forEach((o,i)=>{o.classList.add('disabled');if(i===q.a)o.classList.add('correct');if(i===ch&&ch!==q.a)o.classList.add('wrong')});
+  let pts=0;const fb=$('fb'),fd=$('fbDetail');
+  if(ch===q.a){cc++;pts=10+sb;sc+=pts;fb.className='feedback show correct-fb';fb.textContent=`✅ 答對了！+${pts} 分`}else{fb.className='feedback show wrong-fb';fb.textContent=`❌ 正確答案是：${q.o[q.a]}`;wr.push({q:q.q,ya:q.o[ch],ca:q.o[q.a],d:q.d})}
+  // Show detailed explanation
+  fd.innerHTML=`<div style="margin-bottom:4px">${q.d}</div><div class="feedback-source">📎 參考文獻：${q.s}</div>`;
+  fd.classList.add('show');
+  $('currentScore').textContent=sc;
+  setTimeout(()=>{qi++;ga=true;$('progressFill').style.width=(qi/qs.length*100)+'%';loadQ()},3500)
 }
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+// END GAME
+async function endGame(){ga=false;clearInterval(ti);const tt=Math.floor((Date.now()-st)/1000);
+  ss('resultScreen');
+  let ic='🏆',tl='太厲害了！';if(cc>=8){ic='🎉';tl='你是身體活動達人！'}else if(cc>=5){ic='💪';tl='不錯喔！'}else if(cc>=3){ic='📚';tl='還有很多可以學習的！'}else{ic='🌱';tl='學習才剛開始！'}
+  $('resultIcon').textContent=ic;$('resultTitle').textContent=tl;$('resultScore').textContent=sc+' 分';
+  $('resultDetail').innerHTML=`👤 ${name}<br>✅ ${cc} / ${qs.length} 題<br>⏱ ${ft(tt)}<br>📊 ${Math.round(cc/qs.length*100)}%`;
+  showIPAQ();await saveR(tt);await loadLB();runAI();
+  // Reset move game
+  $('moveBody').classList.remove('open');$('moveSquare').className='move-square gray';$('moveSquare').textContent='🦵';$('moveInstruction').textContent='點下方按鈕開始';$('moveProgressFill').style.width='0%';$('moveDone').style.display='none';$('moveStartBtn').style.display='block';$('moveRetryBtn').style.display='none';$('moveCount').textContent='';$('movePhase').textContent='準備開始...';clearTimeout(mt);
 }
 
-function formatTime(s) {
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+// IPAQ FEEDBACK
+function showIPAQ(){const fb=$('ipaFeedback');if(!ip){fb.style.display='none';return}const met=calcMET(ip);const lv=getLevel(met,ip);fb.style.display='block';
+  const wm=600,mpct=Math.min(100,Math.round(met/wm*100));
+  const sa=ip.sitHours>=8?`⚠️ 你每日久坐 ${ip.sitHours} 小時，超過 8 小時警戒線！建議每 30 分鐘起身走走。`:ip.sitHours>=6?`⚡ 每日久坐 ${ip.sitHours} 小時，接近警戒值，記得起身動一動。`:`✅ 每日久坐 ${ip.sitHours} 小時，不錯！`;
+  let ll,lc,gt;
+  if(lv==='high'){ll='🏃 高度活躍';lc='high';gt=`太棒了！你每週總活動量約 <b>${met} MET-分鐘</b>，超過 WHO 建議的 ${wm} MET-分鐘，也符合台灣衛福部 7333（每週3次、每次30分鐘）。你是模範生！`}
+  else if(lv==='moderate'){ll='🚶 中度活躍';lc='moderate';const g=Math.max(0,wm-met);gt=`每週約 <b>${met} MET-分鐘</b>，剛好達標！想更上層樓？每天再多 ${Math.round(g/4/7)} 分鐘快走就夠了。`}
+  else{ll='🪑 低度活躍';lc='low';const g=wm-met;gt=`每週約 <b>${met} MET-分鐘</b>，離 WHO 建議還差 ${g} MET-分鐘。別擔心！每天多走 ${Math.round(g/4/7)} 分鐘，或換成 ${Math.round(g/8/7)} 分鐘爬樓梯就達標了。即使每天多動 5 分鐘也有幫助！`}
+  fb.innerHTML=`<h3>📊 你的身體活動評估</h3><div class="ipa-level ${lc}">${ll}</div><div class="ipa-bar"><div class="ipa-bar-fill" style="width:${mpct}%;background:${lc==='high'?'#38ef7d':lc==='moderate'?'#ffa502':'#ff4757'}"></div></div><div class="ipa-detail">每週總活動量：<b>${met} MET-分鐘</b>／WHO 建議 ${wm} MET-分鐘（${mpct}%）</div><div class="ipa-detail" style="margin-top:8px">${gt}</div><div class="ipa-detail" style="margin-top:8px">${sa}</div><div class="ipa-detail" style="margin-top:6px;font-size:11px;color:#5a8898">📎 WHO 2020｜ACSM 2022｜台灣衛福部 7333</div>`
 }
 
-// ====== START ======
-function goToSurvey() {
-  const nameInput = document.getElementById('playerName');
-  playerName = nameInput.value.trim();
-  if (!playerName) { nameInput.focus(); nameInput.style.borderColor = '#ff4757'; return; }
-  nameInput.style.borderColor = '';
-  showScreen('surveyScreen');
+// SUPABASE
+async function saveR(tt){if(!supabase)return;try{const d=qs.map(q=>({q:q.q,ca:q.o[q.a]}));const r={player_name:name,score:sc,correct_count:cc,total_questions:qs.length,time_seconds:tt,answers_detail:d,difficulty:'normal'};if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}await supabase.from('pa_game_records').insert(r)}catch(e){console.error(e)}}
+async function loadLB(){const lb=$('leaderboardList');if(!supabase){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">（離線模式）</div>';return}try{const{data,error}=await supabase.from('pa_game_records').select('player_name,score,correct_count,total_questions,time_seconds').order('score',{ascending:false}).order('time_seconds',{ascending:true}).limit(10);if(error)throw error;if(!data||data.length===0){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">尚無記錄，快來挑戰！</div>';return}lb.innerHTML=data.map((r,i)=>{const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);return`<div class="lb-row"><span>${m} <span class="lb-name">${r.player_name}</span></span><span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${ft(r.time_seconds)}</span></div>`}).join('')}catch(e){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">排行榜載入中...</div>'}}
+
+// MOVE GAME
+const MV_PHASES=[{n:'🔴 練習：紅色出現 → 雙腳離地跳！',s:['red','gray','gray','red','gray']},{n:'🔵 練習：藍色出現 → 深蹲！',s:['gray','blue','blue','gray','blue']},{n:'🔥 綜合挑戰：紅跳、藍蹲、灰不動！',s:null}];
+
+function toggleMoveGame(){const b=$('moveBody');b.classList.toggle('open')}
+function launchMoveGame(){
+  const b=$('moveBody');b.classList.add('open');
+  const p3=['red','red','red','red','red','blue','blue','blue','blue','blue','gray','gray','gray','gray','gray'];sh(p3);MV_PHASES[2].s=p3;
+  mph=0;mi=0;ms=[];
+  $('moveDone').style.display='none';$('moveStartBtn').style.display='none';$('moveRetryBtn').style.display='none';
+  $('moveSquare').className='move-square gray';$('moveSquare').textContent='🦵';
+  $('moveInstruction').textContent='準備...';$('moveProgressFill').style.width='0%';
+  setTimeout(runPhase,700)
 }
-
-function skipSurvey() {
-  ipaqData = null;
-  questions = shuffle(QUESTION_BANK).slice(0, 10);
-  currentQ = 0; score = 0; correctCount = 0; wrongQuestions = [];
-  gameActive = true;
-  initGameScreen();
-  showScreen('gameScreen');
-  startTime = Date.now();
-  timerInterval = setInterval(updateTimer, 1000);
-  loadQuestion();
+function runPhase(){if(mph>=MV_PHASES.length){doneMove();return}const p=MV_PHASES[mph];ms=p.s;mi=0;$('movePhase').textContent=`第 ${mph+1}/3 階段：${p.n}`;$('moveProgressFill').style.width='0%';setTimeout(nextItem,600)}
+function nextItem(){if(mi>=ms.length){mph++;setTimeout(runPhase,500);return}const c=ms[mi];const sq=$('moveSquare'),ins=$('moveInstruction'),pr=$('moveProgressFill');sq.className='move-square';void sq.offsetWidth;
+  if(c==='red'){sq.className='move-square red pop';sq.textContent='🔴';ins.textContent='🔴 跳！雙腳離地！'}
+  else if(c==='blue'){sq.className='move-square blue pop';sq.textContent='🔵';ins.textContent='🔵 蹲！深蹲下去！'}
+  else{sq.className='move-square gray pop';sq.textContent='⬛';ins.textContent='⬛ 不要動～'}
+  pr.style.width=Math.round((mi+1)/ms.length*100)+'%';$('moveCount').textContent=`${mi+1}/${ms.length}`;mi++;
+  mt=setTimeout(()=>{sq.className='move-square gray';sq.textContent='🦵';ins.textContent='...';mt=setTimeout(nextItem,400)},1800)
 }
-
-function updateSurveyPreview() {
-  const d = readIpaqForm();
-  if (!d) return;
-  const met = calcMET(d);
-  const level = getActivityLevel(met, d);
-  const preview = document.getElementById('surveyPreview');
-  const text = document.getElementById('surveyPreviewText');
-  if (met === 0) { preview.style.display = 'none'; return; }
-  preview.style.display = 'block';
-  const label = level === 'high' ? '🏃 高度活躍' : level === 'moderate' ? '🚶 中度活躍' : '🪑 低度活躍';
-  text.textContent = `總活動量約 ${met} MET-分鐘/週 → ${label}\n每日久坐約 ${d.sitHours} 小時`;
-}
-
-function startGame() {
-  const d = readIpaqForm();
-  ipaqData = d;
-  questions = shuffle(QUESTION_BANK).slice(0, 10);
-  currentQ = 0; score = 0; correctCount = 0; wrongQuestions = [];
-  gameActive = true;
-  initGameScreen();
-  showScreen('gameScreen');
-  startTime = Date.now();
-  timerInterval = setInterval(updateTimer, 1000);
-  loadQuestion();
-}
-
-function initGameScreen() {
-  document.getElementById('displayName').textContent = playerName;
-  document.getElementById('currentScore').textContent = '0';
-  document.getElementById('currentTimer').textContent = '00:00';
-  document.getElementById('progressFill').style.width = '0%';
-  document.getElementById('feedback').classList.remove('show', 'correct-fb', 'wrong-fb');
-}
-
-function readIpaqForm() {
-  const vpaDays = parseInt(document.getElementById('vpaDays').value) || 0;
-  const vpaMins = parseInt(document.getElementById('vpaMins').value) || 0;
-  const mpaDays = parseInt(document.getElementById('mpaDays').value) || 0;
-  const mpaMins = parseInt(document.getElementById('mpaMins').value) || 0;
-  const walkDays = parseInt(document.getElementById('walkDays').value) || 0;
-  const walkMins = parseInt(document.getElementById('walkMins').value) || 0;
-  const sitHours = parseInt(document.getElementById('sitHours').value) || 0;
-  return { vpaDays, vpaMins, mpaDays, mpaMins, walkDays, walkMins, sitHours };
-}
-
-function calcMET(d) {
-  const walkMET = 3.3 * d.walkMins * d.walkDays;
-  const mpaMET = 4.0 * d.mpaMins * d.mpaDays;
-  const vpaMET = 8.0 * d.vpaMins * d.vpaDays;
-  return Math.round(walkMET + mpaMET + vpaMET);
-}
-
-function getActivityLevel(totalMET, d) {
-  const vpaDaysOk = d.vpaDays >= 3 && d.vpaMins >= 20;
-  const modDaysOk = (d.mpaDays + d.walkDays) >= 5 && ((d.mpaMins * d.mpaDays + d.walkMins * d.walkDays) / Math.max(1, d.mpaDays + d.walkDays)) >= 30;
-  const anyCombo = totalMET >= 600;
-  const vpaHigh = d.vpaDays >= 3 && totalMET >= 1500;
-  const anyHigh = (d.vpaDays + d.mpaDays + d.walkDays) >= 7 && totalMET >= 3000;
-  if (vpaHigh || anyHigh) return 'high';
-  if (vpaDaysOk || modDaysOk || anyCombo) return 'moderate';
-  return 'low';
-}
-
-function updateTimer() {
-  if (!gameActive) return;
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
-  document.getElementById('currentTimer').textContent = formatTime(elapsed);
-}
-
-function loadQuestion() {
-  if (currentQ >= questions.length) { endGame(); return; }
-
-  const q = questions[currentQ];
-  document.getElementById('questionNumber').textContent = `第 ${currentQ + 1} / ${questions.length} 題`;
-  document.getElementById('questionText').textContent = q.q;
-  document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
-  document.getElementById('feedback').classList.remove('show', 'correct-fb', 'wrong-fb');
-
-  const container = document.getElementById('optionsContainer');
-  container.innerHTML = '';
-  q.opts.forEach((opt, i) => {
-    const div = document.createElement('div');
-    div.className = 'option';
-    div.textContent = opt;
-    div.onclick = () => selectAnswer(i);
-    container.appendChild(div);
-  });
-}
-
-function selectAnswer(chosen) {
-  if (!gameActive) return;
-  gameActive = false;
-
-  const q = questions[currentQ];
-  const options = document.querySelectorAll('.option');
-  const speedBonus = Math.max(0, 15 - Math.floor((Date.now() - startTime) / 1000 / currentQ));
-
-  options.forEach((opt, i) => {
-    opt.classList.add('disabled');
-    if (i === q.ans) opt.classList.add('correct');
-    if (i === chosen && chosen !== q.ans) opt.classList.add('wrong');
-  });
-
-  let points = 0;
-  const fb = document.getElementById('feedback');
-
-  if (chosen === q.ans) {
-    correctCount++;
-    points = 10 + speedBonus;
-    score += points;
-    fb.className = 'feedback show correct-fb';
-    fb.textContent = `✅ 答對了！+${points} 分（含速度加分 +${speedBonus}）`;
-  } else {
-    fb.className = 'feedback show wrong-fb';
-    fb.textContent = `❌ 答錯了！正確答案是：${q.opts[q.ans]}`;
-    wrongQuestions.push({
-      question: q.q,
-      yourAnswer: q.opts[chosen],
-      correctAnswer: q.opts[q.ans],
-      explanation: q.exp
-    });
-  }
-
-  document.getElementById('currentScore').textContent = score;
-
-  setTimeout(() => {
-    currentQ++;
-    gameActive = true;
-    document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
-    loadQuestion();
-  }, 1800);
-}
-
-// ====== END GAME ======
-async function endGame() {
-  gameActive = false;
-  clearInterval(timerInterval);
-  const totalTime = Math.floor((Date.now() - startTime) / 1000);
-
-  showScreen('resultScreen');
-
-  let icon = '🏆', title = '太厲害了！';
-  if (correctCount >= 8) { icon = '🎉'; title = '你是身體活動達人！'; }
-  else if (correctCount >= 5) { icon = '💪'; title = '不錯喔！繼續加油！'; }
-  else if (correctCount >= 3) { icon = '📚'; title = '還有很多可以學習的！'; }
-  else { icon = '🌱'; title = '沒關係，學習才剛開始！'; }
-
-  document.getElementById('resultIcon').textContent = icon;
-  document.getElementById('resultTitle').textContent = title;
-  document.getElementById('resultScore').textContent = score + ' 分';
-  document.getElementById('resultDetail').innerHTML =
-    `👤 ${playerName}<br>` +
-    `✅ 答對 ${correctCount} / ${questions.length} 題<br>` +
-    `⏱ 花費時間 ${formatTime(totalTime)}<br>` +
-    `📊 正確率 ${Math.round(correctCount / questions.length * 100)}%`;
-
-  // Save to Supabase
-  await saveResult(totalTime);
-  // Load leaderboard
-  await loadLeaderboard();
-  // IPAQ feedback
-  showIPAQFeedback();
-  // Trigger AI analysis
-  runAIAnalysis();
-}
-
-// ====== IPAQ FEEDBACK (WHO/ACSM/衛福部 guidelines) ======
-function showIPAQFeedback() {
-  const fb = document.getElementById('ipaFeedback');
-  if (!ipaqData) {
-    fb.style.display = 'none';
-    return;
-  }
-  const met = calcMET(ipaqData);
-  const level = getActivityLevel(met, ipaqData);
-  fb.style.display = 'block';
-
-  // Guideline targets
-  const whoMPA = 150;   // min/week moderate
-  const whoVPA = 75;    // min/week vigorous
-  const whoMET = 600;   // MET-min/week
-  const taiwanDays = 3; // 7333
-  const taiwanMins = 30;
-
-  const sitAdvice = ipaqData.sitHours >= 8
-    ? `⚠️ 你每日久坐 ${ipaqData.sitHours} 小時，超過8小時，建議每30分鐘起身活動一下。`
-    : ipaqData.sitHours >= 6
-    ? `⚡ 你每日久坐 ${ipaqData.sitHours} 小時，接近警戒值。記得定時起身走動。`
-    : `✅ 你每日久坐 ${ipaqData.sitHours} 小時，狀況不錯！`;
-
-  const metPct = Math.min(100, Math.round(met / whoMET * 100));
-
-  let levelLabel, levelClass, guidelineText;
-  if (level === 'high') {
-    levelLabel = '🏃 高度活躍';
-    levelClass = 'high';
-    guidelineText = `太棒了！你每週總活動量約 <b>${met} MET-分鐘</b>，已經超過 WHO 建議的 ${whoMET} MET-分鐘標準，也符合台灣衛福部「7333」每週3次、每次30分鐘的建議。你是身體活動模範生，繼續保持！`;
-  } else if (level === 'moderate') {
-    levelLabel = '🚶 中度活躍';
-    levelClass = 'moderate';
-    const gapMins = Math.round(Math.max(0, whoMET - met) / 4.0);
-    guidelineText = `你每週總活動量約 <b>${met} MET-分鐘</b>，剛好達標 WHO 的最低建議！如果想更上一層樓，每週再多 <b>${gapMins} 分鐘</b>快走就夠了～或者換成 ${Math.round(Math.max(0,whoMET-met)/8)} 分鐘的爬樓梯衝刺也 OK！`;
-  } else {
-    levelLabel = '🪑 低度活躍';
-    levelClass = 'low';
-    const gapMins = Math.round(Math.max(0, whoMET - met) / 4.0);
-    const gapVPA = Math.round(Math.max(0, whoMET - met) / 8.0);
-    guidelineText = `你每週總活動量約 <b>${met} MET-分鐘</b>，距離 WHO 建議的 ${whoMET} MET-分鐘還差一點點。別擔心！每週多走 <b>${gapMins} 分鐘</b>（每天大概多 ${Math.round(gapMins/7)} 分鐘），或換成 <b>${gapVPA} 分鐘</b>的爬樓梯、快走通勤，不知不覺就達標了！`;
-  }
-
-  fb.innerHTML = `
-    <h3>📊 你的身體活動評估</h3>
-    <div class="ipa-level ${levelClass}">${levelLabel}</div>
-    <div class="ipa-bar"><div class="ipa-bar-fill" style="width:${metPct}%;background:${level==='high'?'#38ef7d':level==='moderate'?'#ffa502':'#ff4757'}"></div></div>
-    <div class="ipa-detail">每週總活動量：<b>${met} MET-分鐘</b>／WHO 建議 ${whoMET} MET-分鐘（達成率 ${metPct}%）</div>
-    <div class="ipa-detail" style="margin-top:8px">${guidelineText}</div>
-    <div class="ipa-detail" style="margin-top:8px">${sitAdvice}</div>
-    <div class="ipa-detail" style="margin-top:6px;font-size:11px;color:#5a7888;">
-      📎 參考：WHO 2020 全球指引｜美國運動醫學會 ACSM｜台灣衛福部「7333」
-    </div>
-  `;
-}
-
-async function saveResult(totalTime) {
-  if (!supabase) { console.warn('Supabase not available, skip save'); return; }
-  try {
-    const detail = questions.map((q, i) => ({
-      question: q.q,
-      correct: q.opts[q.ans]
-    }));
-    const record = {
-      player_name: playerName,
-      score: score,
-      correct_count: correctCount,
-      total_questions: questions.length,
-      time_seconds: totalTime,
-      answers_detail: detail,
-      difficulty: 'normal'
-    };
-    if (ipaqData) {
-      const met = calcMET(ipaqData);
-      record.ipaq_data = ipaqData;
-      record.activity_level = getActivityLevel(met, ipaqData);
-      record.total_met = met;
-    }
-    await supabase.from('pa_game_records').insert(record);
-  } catch (e) {
-    console.error('Save error:', e);
-  }
-}
-
-async function loadLeaderboard() {
-  const lb = document.getElementById('leaderboardList');
-  if (!supabase) {
-    lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">（離線模式）</div>';
-    return;
-  }
-  try {
-    const { data, error } = await supabase
-      .from('pa_game_records')
-      .select('player_name, score, correct_count, total_questions, time_seconds')
-      .order('score', { ascending: false })
-      .order('time_seconds', { ascending: true })
-      .limit(10);
-
-    if (error) throw error;
-    if (!data || data.length === 0) {
-      lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">尚無記錄，快來挑戰！</div>';
-      return;
-    }
-
-    lb.innerHTML = data.map((r, i) => {
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-      return `<div class="lb-row">
-        <span>${medal} <span class="lb-name">${r.player_name}</span></span>
-        <span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${formatTime(r.time_seconds)}</span>
-      </div>`;
-    }).join('');
-
-  } catch (e) {
-    console.error('LB error:', e);
-    lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">排行榜載入中...</div>';
-  }
-}
-
-function restartGame() {
-  clearInterval(timerInterval);
-  currentQ = 0; score = 0; correctCount = 0; gameActive = false;
-  ipaqData = null; wrongQuestions = [];
-  showScreen('startScreen');
-  document.getElementById('playerName').value = '';
-  document.getElementById('ipaFeedback').innerHTML = '';
-  document.getElementById('aiAnalysis').style.display = 'none';
-}
-
-function shareResult() {
-  const msg = `🧠 我在「身體活動知識挑戰」中獲得 ${score} 分！\n✅ ${correctCount}/${questions.length} 題正確\n你也來挑戰看看吧！`;
-  if (navigator.share) {
-    navigator.share({ title: '身體活動知識挑戰', text: msg });
-  } else {
-    navigator.clipboard.writeText(msg).then(() => alert('結果已複製到剪貼簿！'));
-  }
-}
-
-// Enter key to start
-document.getElementById('playerName').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') startGame();
-});
-
-// ====== AI FUNCTIONS (via Supabase Edge Function) ======
-async function callGroq(systemPrompt, userMessage) {
-  const resp = await fetch(`${SUPABASE_URL}/functions/v1/groq-proxy`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      system: systemPrompt,
-      message: userMessage,
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 600
-    })
-  });
-  if (!resp.ok) throw new Error('API error');
-  const data = await resp.json();
-  return data.content || '抱歉，AI暫時無法回應，請稍後再試。';
-}
-
-async function runAIAnalysis() {
-  const panel = document.getElementById('aiAnalysis');
-  const content = document.getElementById('aiAnalysisContent');
-  if (wrongQuestions.length === 0) {
-    panel.style.display = 'block';
-    content.innerHTML = '🎉 你全部答對了！你已經掌握了身體活動的核心知識，繼續保持運動習慣、跟身邊的人分享這些重要觀念吧！';
-    return;
-  }
-  panel.style.display = 'block';
-  content.innerHTML = '<span class="ai-typing">🤖 AI 正在分析你的作答...</span>';
-
-  const wrongSummary = wrongQuestions.map((w, i) =>
-    `第${i+1}題：${w.question}\n我選了：${w.yourAnswer}\n正確答案：${w.correctAnswer}`
-  ).join('\n\n');
-
-  const prompt = `你是一位專業的運動科學與健康心理學專家。以下是一位台灣使用者玩身體活動知識測驗的結果：
-- 答對：${correctCount}/${questions.length} 題
-- 答錯的題目如下：
-
-${wrongSummary}
-
-請用繁體中文，以溫暖、鼓勵的口吻，給使用者：
-1. 一句整體鼓勵（一兩句）
-2. 針對他答錯的題目，簡短解釋正確概念（2-3個重點）
-3. 給他一個具體的、今天就可以開始做的運動小建議（結合他的知識缺口來建議）
-總共控制在200字以內，格式用自然的段落呈現，不要用編號。`;
-
-  try {
-    const aiText = await callGroq(
-      '你是專業的運動科學與健康心理學專家，擅長用白話、溫暖的方式解釋專業知識。請用繁體中文回應。',
-      prompt
-    );
-    content.textContent = aiText;
-  } catch (e) {
-    content.innerHTML = '<span class="ai-error">AI 分析暫時不可用，請稍後再試</span>';
-  }
-}
-
-// ====== AI CHAT COACH ======
-function openAICoach() {
-  document.getElementById('chatModal').style.display = 'flex';
-  document.getElementById('chatInput').focus();
-}
-
-function closeAICoach() {
-  document.getElementById('chatModal').style.display = 'none';
-}
-
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-
-  const chatMsgs = document.getElementById('chatMessages');
-  chatMsgs.innerHTML += `<div class="chat-msg user">${msg}</div>`;
-
-  // Add loading
-  const loadingId = 'loading_' + Date.now();
-  chatMsgs.innerHTML += `<div class="chat-msg ai" id="${loadingId}"><span class="ai-typing">思考中...</span></div>`;
-  chatMsgs.scrollTop = chatMsgs.scrollHeight;
-
-  const systemPrompt = `你是專業的運動科學與健康心理學專家。你擅長用白話、溫暖的繁體中文解釋身體活動相關知識。
-你的知識領域包括：
-- 身體活動與健康（全球PA不足現況、WHO建議）
-- 目標設定理論（Locke & Latham）、SMART目標、學習型目標（Seijts & Latham）
-- 運動強度（LPA/MPA/VPA）、Biswas強度換算、VILPA概念
-- 雙模理論（Dual Mode Theory, Ekkekakis 2003）、情感與運動堅持
-- 自我效能理論（Bandura）、向上螺旋理論（Cappellen）
-- 運動補償效應（Gay 2017）
-- 上班族久坐與健康
-請以200字以內簡潔回答，給出實用建議。若問題超出範圍，禮貌告知專注領域。`;
-
-  try {
-    const reply = await callGroq(systemPrompt, msg);
-    document.getElementById(loadingId).innerHTML = reply;
-  } catch (e) {
-    document.getElementById(loadingId).innerHTML = '<span class="ai-error">AI 暫時無法回應</span>';
-  }
-  chatMsgs.scrollTop = chatMsgs.scrollHeight;
-}
-
-// ====== MOVE GAME ======
-let moveTimer = null;
-let moveSeq = [];
-let moveIdx = 0;
-let movePhaseIdx = 0;
-let moveTotal = 0;
-const MOVE_PHASES = [
-  { name: '🔴 練習：看到紅色 → 雙腳離地跳！', phases: ['red','gray','gray','red','gray'] },
-  { name: '🔵 練習：看到藍色 → 深蹲！',    phases: ['gray','blue','blue','gray','blue'] },
-  { name: '🔥 綜合挑戰！',                  phases: null }
-];
-
-function startMoveGame() {
-  // Phase 3: generate 15-trial sequence
-  const phase3seq = ['red','red','red','red','red',
-                     'blue','blue','blue','blue','blue',
-                     'gray','gray','gray','gray','gray'];
-  shuffle(phase3seq);
-  MOVE_PHASES[2].phases = phase3seq;
-
-  movePhaseIdx = 0;
-  moveIdx = 0;
-  moveSeq = [];
-
-  document.getElementById('moveResult').style.display = 'none';
-  document.getElementById('moveCompleteMsg').style.display = 'none';
-  document.getElementById('moveBackBtn').style.display = 'none';
-  document.getElementById('moveScreen').style.display = 'flex';
-  document.getElementById('moveScreen').style.alignItems = 'center';
-  document.getElementById('moveScreen').style.justifyContent = 'center';
-  runPhase();
-}
-
-function runPhase() {
-  if (movePhaseIdx >= MOVE_PHASES.length) {
-    completeMoveGame();
-    return;
-  }
-  const phase = MOVE_PHASES[movePhaseIdx];
-  moveSeq = phase.phases;
-  moveIdx = 0;
-  moveTotal = moveSeq.length;
-
-  document.getElementById('movePhase').textContent =
-    `第 ${movePhaseIdx+1} / ${MOVE_PHASES.length} 階段`;
-  document.getElementById('moveSquare').className = 'move-square gray';
-  document.getElementById('moveInstruction').textContent = '準備...';
-  document.getElementById('moveProgressFill').style.width = '0%';
-
-  setTimeout(() => nextMoveItem(), 800);
-}
-
-function nextMoveItem() {
-  if (moveIdx >= moveTotal) {
-    movePhaseIdx++;
-    setTimeout(() => runPhase(), 600);
-    return;
-  }
-
-  const color = moveSeq[moveIdx];
-  const square = document.getElementById('moveSquare');
-  const inst = document.getElementById('moveInstruction');
-  const progress = document.getElementById('moveProgressFill');
-
-  // Remove animation class, then re-add
-  square.className = 'move-square';
-  void square.offsetWidth; // reflow
-
-  if (color === 'red') {
-    square.className = 'move-square red show';
-    inst.textContent = '🔴 跳！雙腳離地！';
-  } else if (color === 'blue') {
-    square.className = 'move-square blue show';
-    inst.textContent = '🔵 蹲！深蹲下去！';
-  } else {
-    square.className = 'move-square gray show';
-    inst.textContent = '⬛ 不要動～';
-  }
-
-  const pct = Math.round((moveIdx + 1) / moveTotal * 100);
-  progress.style.width = pct + '%';
-  document.getElementById('moveCount').textContent =
-    `${moveIdx+1} / ${moveTotal}`;
-
-  moveIdx++;
-
-  // Show for 2.5s, then pause 0.8s, then next
-  moveTimer = setTimeout(() => {
-    square.className = 'move-square gray';
-    inst.textContent = '...';
-    moveTimer = setTimeout(() => nextMoveItem(), 500);
-  }, 2000);
-}
-
-function completeMoveGame() {
-  clearTimeout(moveTimer);
-  document.getElementById('movePhase').textContent = '';
-  document.getElementById('moveCount').textContent = '';
-  document.getElementById('moveInstruction').textContent = '';
-  document.getElementById('moveSquare').className = 'move-square gray';
-  document.getElementById('moveProgressFill').style.width = '100%';
-
-  document.getElementById('moveResult').style.display = 'block';
-  document.getElementById('moveResult').textContent = '🎉 太棒了！';
-  document.getElementById('moveCompleteMsg').style.display = 'block';
-  document.getElementById('moveCompleteMsg').innerHTML =
-    '你剛剛完成了 25 次反應運動！<br>' +
-    '科學研究說：短時間的穿插式活動就能促進健康。<br>' +
-    '每天找幾個空檔動一動，身體會感謝你 💪';
-  document.getElementById('moveBackBtn').style.display = 'block';
-}
-
-function backToResult() {
-  clearTimeout(moveTimer);
-  document.getElementById('moveSquare').className = 'move-square gray';
-  document.getElementById('moveScreen').style.display = 'none';
-}
+function doneMove(){clearTimeout(mt);$('movePhase').textContent='';$('moveCount').textContent='';$('moveInstruction').textContent='';$('moveSquare').className='move-square gray';$('moveSquare').textContent='🏆';$('moveProgressFill').style.width='100%';$('moveDone').style.display='block';$('moveRetryBtn').style.display='block'}
+
+// AI
+async function callAI(sys,msg){try{const r=await fetch(SUPA_URL+'/functions/v1/groq-proxy',{method:'POST',headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({system:sys,message:msg,model:'llama-3.3-70b-versatile',max_tokens:400})});const d=await r.json();return d.content||'AI 暫時無法回應'}catch(e){return'AI 暫時不可用'}}
+async function runAI(){const p=$('aiAnalysis'),c=$('aiAnalysisContent');if(wr.length===0){p.style.display='block';c.textContent='🎉 全部答對！你已經掌握身體活動的核心知識，保持運動習慣，跟身邊的人分享吧！';return}p.style.display='block';c.innerHTML='<span class="ai-typing">🤖 AI 分析中...</span>';
+  const s=wr.map((w,i)=>`錯${i+1}：${w.q}｜我選${w.ya}｜正確${w.ca}`).join('\n');
+  const pm=`你是運動科學專家。使用者答對 ${cc}/${qs.length} 題。錯題：\n${s}\n請用繁體中文、溫暖口吻，給鼓勵（1-2句）、針對錯題的正確知識（2-3點）、一個今天就能做的運動小建議。200字內，用自然段落。`;
+  try{c.textContent=await callAI('你是專業運動科學與健康心理學專家，用白話、溫暖的繁體中文回應。',pm)}catch(e){c.innerHTML='<span class="ai-error">AI 暫時不可用</span>'}}
+
+// AI CHAT
+function openAICoach(){$('chatModal').style.display='flex';$('chatInput').focus()}
+function closeAICoach(){$('chatModal').style.display='none'}
+async function sendChat(){const inp=$('chatInput');const m=inp.value.trim();if(!m)return;inp.value='';const ms=$('chatMessages');ms.innerHTML+=`<div class="chat-msg user">${m}</div>`;const lid='l_'+Date.now();ms.innerHTML+=`<div class="chat-msg ai" id="${lid}"><span class="ai-typing">思考中...</span></div>`;ms.scrollTop=ms.scrollHeight;
+  const sp='你是運動科學與健康心理學專家，用白話繁體中文回答。知識領域：身體活動與健康、目標設定理論（Locke&Latham/Seijts&Latham）、運動強度與雙模理論（Ekkekakis）、自我效能（Bandura）、向上螺旋、補償效應、上班族久坐。150字內，給實用建議。';
+  try{$(lid).textContent=await callAI(sp,m)}catch(e){$(lid).innerHTML='<span class="ai-error">AI 暫時不可用</span>'}ms.scrollTop=ms.scrollHeight}
+
+// RESTART
+function restartGame(){clearInterval(ti);clearTimeout(mt);qi=0;sc=0;cc=0;ga=false;ip=null;wr=[];ss('startScreen');$('playerName').value=''}
+function shareResult(){const m=`🧠 我在「身體活動知識挑戰」獲得 ${sc} 分！\n✅ ${cc}/${qs.length} 題正確\n你也來挑戰：https://cting2100.github.io/pa-knowledge-quiz/`;if(navigator.share){navigator.share({title:'身體活動知識挑戰',text:m})}else{navigator.clipboard.writeText(m).then(()=>alert('已複製到剪貼簿！'))}}
+$('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')goToSurvey()})
 </script>
 </body>
 </html>
