@@ -289,7 +289,8 @@ input[type=text]:focus { border-color: #7ee8d6; }
   </div>
 
   <!-- MOVE GAME SCREEN -->
-  <div id="moveScreen" class="screen">
+  <div id="moveScreen" class="screen" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:150;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);overflow-y:auto;padding:20px;">
+    <div class="container" style="margin:20px auto;max-width:500px;background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border-radius:24px;padding:24px;border:1px solid rgba(255,255,255,0.12);">
     <div class="move-container">
       <div class="move-phase" id="movePhase"></div>
       <div class="move-count" id="moveCount"></div>
@@ -304,6 +305,7 @@ input[type=text]:focus { border-color: #7ee8d6; }
       <div class="move-result" id="moveResult" style="display:none"></div>
       <div class="move-complete-msg" id="moveCompleteMsg" style="display:none"></div>
       <button class="btn btn-primary" id="moveBackBtn" style="display:none" onclick="backToResult()">回到結果 🔙</button>
+    </div>
     </div>
   </div>
 
@@ -984,7 +986,7 @@ const MOVE_PHASES = [
 ];
 
 function startMoveGame() {
-  // Phase 3: generate 15-trial sequence with 5 red, 5 blue, 5 other
+  // Phase 3: generate 15-trial sequence
   const phase3seq = ['red','red','red','red','red',
                      'blue','blue','blue','blue','blue',
                      'gray','gray','gray','gray','gray'];
@@ -998,7 +1000,9 @@ function startMoveGame() {
   document.getElementById('moveResult').style.display = 'none';
   document.getElementById('moveCompleteMsg').style.display = 'none';
   document.getElementById('moveBackBtn').style.display = 'none';
-  showScreen('moveScreen');
+  document.getElementById('moveScreen').style.display = 'flex';
+  document.getElementById('moveScreen').style.alignItems = 'center';
+  document.getElementById('moveScreen').style.justifyContent = 'center';
   runPhase();
 }
 
@@ -1084,7 +1088,7 @@ function completeMoveGame() {
 function backToResult() {
   clearTimeout(moveTimer);
   document.getElementById('moveSquare').className = 'move-square gray';
-  showScreen('resultScreen');
+  document.getElementById('moveScreen').style.display = 'none';
 }
 </script>
 </body>
