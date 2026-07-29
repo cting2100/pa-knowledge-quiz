@@ -59,31 +59,34 @@ input[type=text]:focus,input[type=number]:focus{border-color:#7ee8d6}
 .ai-typing{color:#7ee8d6;font-size:13px}
 .ai-error{color:#ff6b6b;font-size:13px}
 
-/* MOVE GAME - embedded inline */
+/* MOVE GAME OVERLAY */
 .move-section{margin:20px 0;background:linear-gradient(135deg,rgba(255,71,87,0.1),rgba(55,66,250,0.1));border-radius:16px;border:2px dashed rgba(255,71,87,0.25);overflow:hidden}
 .move-header{padding:18px;cursor:pointer;text-align:center}
 .move-header h3{font-size:20px;color:#ff6b81;margin-bottom:4px}
 .move-header .hint{font-size:12px;color:#a0b8c8}
 .move-body{display:none;padding:0 18px 18px}
 .move-body.open{display:block}
-.move-phase{font-size:14px;color:#7ee8d6;text-align:center;margin-bottom:4px}
-.move-count{font-size:13px;color:#a0b8c8;text-align:center;margin-bottom:12px}
-.move-instruction{font-size:22px;font-weight:800;text-align:center;min-height:36px;margin-bottom:10px;transition:all .2s}
-.move-legend{display:flex;gap:16px;justify-content:center;margin-bottom:14px;font-size:13px;color:#a0b8c8}
-.move-legend span{display:flex;align-items:center;gap:6px}
-.move-dot{width:16px;height:16px;border-radius:4px;display:inline-block}
-.move-square{width:160px;height:160px;margin:0 auto 16px;border-radius:20px;background:#555;transition:background .15s,transform .15s;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900}
-.move-square.pop{animation:popIn .3s ease-out}
-@keyframes popIn{0%{transform:scale(0.3);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
-.move-square.red{background:#ff4757;box-shadow:0 0 60px rgba(255,71,87,0.6)}
-.move-square.blue{background:#3742fa;box-shadow:0 0 60px rgba(55,66,250,0.6)}
-.move-square.gray{background:#555}
-.move-progress{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:10px 0;overflow:hidden}
+.move-rule-text{font-size:26px;font-weight:800;line-height:1.6}
+.move-rule-text .red{color:#ff4757}.move-rule-text .blue{color:#3742fa}.move-rule-text .green{color:#2ed573}.move-rule-text .yellow{color:#ffa502}
+.move-big-square{width:200px;height:200px;border-radius:24px;margin:20px auto;transition:background .2s,transform .2s;display:flex;align-items:center;justify-content:center}
+.move-big-square.pop{animation:popIn .3s ease-out}
+@keyframes popIn{0%{transform:scale(0.4);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+.move-big-square.red{background:#ff4757;box-shadow:0 0 80px rgba(255,71,87,0.5)}
+.move-big-square.blue{background:#3742fa;box-shadow:0 0 80px rgba(55,66,250,0.5)}
+.move-big-square.green{background:#2ed573;box-shadow:0 0 80px rgba(46,213,115,0.5)}
+.move-big-square.yellow{background:#ffa502;box-shadow:0 0 80px rgba(255,165,2,0.5)}
+.move-big-square.gray{background:#444}
+.move-big-square .emoji{font-size:72px}
+.move-counter{font-size:14px;color:#8899aa;margin-bottom:8px}
+.move-progress{width:260px;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;margin:0 auto 10px;overflow:hidden}
 .move-progress-fill{height:100%;background:#38ef7d;border-radius:3px;transition:width .3s}
-.move-done{text-align:center;display:none}
-.move-done .icon{font-size:48px}
-.move-done .msg{font-size:16px;color:#38ef7d;font-weight:800;margin:8px 0}
-.move-done .sub{font-size:13px;color:#a0b8c8;line-height:1.6}
+.move-done-msg{font-size:22px;font-weight:800;color:#38ef7d;margin:10px 0}
+.move-done-sub{font-size:14px;color:#8899aa;line-height:1.6}
+.move-btn{margin-top:20px;display:inline-block;padding:14px 40px;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.move-btn.red-btn{background:linear-gradient(135deg,#ff4757,#ff6b81);color:#fff}
+.move-btn.blue-btn{background:linear-gradient(135deg,#3742fa,#5352ed);color:#fff}
+.move-btn.green-btn{background:linear-gradient(135deg,#11998e,#38ef7d);color:#000}
+.move-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
 /* CHAT */
 .chat-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:200}
 .chat-box{width:90%;max-width:500px;max-height:80vh;background:#1a2a3a;border-radius:18px;border:1px solid rgba(126,232,214,0.3);display:flex;flex-direction:column;overflow:hidden}
@@ -177,23 +180,20 @@ input[type=text]:focus,input[type=number]:focus{border-color:#7ee8d6}
 <div class="ipa-feedback-card" id="ipaFeedback"></div>
 <div class="leaderboard"><h3>🏅 排行榜 TOP 10</h3><div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div></div>
 
-<!-- MOVE GAME - embedded directly in result page -->
+<!-- MOVE GAME - expand section on result page -->
 <div class="move-section" id="moveSection">
 <div class="move-header" onclick="toggleMoveGame()">
 <h3>🦵 起來動一動！</h3>
-<div class="hint">點擊展開 → 跟著畫面做簡單的跳躍和深蹲</div>
+<div class="hint">點擊展開 → 跟著畫面跳躍和深蹲</div>
 </div>
 <div class="move-body" id="moveBody">
-<div class="move-phase" id="movePhase">準備開始...</div>
-<div class="move-count" id="moveCount"></div>
-<div class="move-instruction" id="moveInstruction">點下方按鈕開始</div>
-<div class="move-legend"><span><span class="move-dot" style="background:#ff4757"></span>🔴雙腳跳</span><span><span class="move-dot" style="background:#3742fa"></span>🔵深蹲</span><span><span class="move-dot" style="background:#555"></span>⬛不動</span></div>
-<div class="move-square gray" id="moveSquare">🦵</div>
-<div class="move-progress"><div class="move-progress-fill" id="moveProgressFill" style="width:0%"></div></div>
-<div class="move-done" id="moveDone"><div class="icon">🎉</div><div class="msg">太棒了！</div><div class="sub">完成了 25 次反應運動！研究說短時間穿插活動就能促進健康。每天找空檔動一動，身體感謝你 💪</div></div>
-<button class="btn btn-primary" id="moveStartBtn" onclick="launchMoveGame()" style="background:linear-gradient(135deg,#ff4757,#ff6b81)">🔥 開始動一動！</button>
-<button class="btn btn-secondary" id="moveRetryBtn" style="display:none" onclick="launchMoveGame()">再來一次 🔄</button>
+<button class="btn btn-primary" onclick="startMoveOverlay()" style="background:linear-gradient(135deg,#ff4757,#ff6b81)">🔥 開始動一動！</button>
 </div>
+</div>
+
+<!-- MOVE GAME FULLSCREEN OVERLAY -->
+<div id="moveOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0d1b2a;z-index:250;overflow:hidden;font-family:'Segoe UI','Microsoft JhengHei',sans-serif;color:#fff;text-align:center">
+  <div id="moveOverlayInner" style="display:flex;align-items:center;justify-content:center;height:100%;padding:20px"></div>
 </div>
 
 <button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
@@ -252,7 +252,7 @@ const Q=[
 ];
 
 // STATE
-let name='',qs=[],qi=0,sc=0,cc=0,st=0,ti=null,ga=null,wr=[],ip=null,mt=null,mi=0,mp=0,ms=[],mph=0;
+let name='',qs=[],qi=0,sc=0,cc=0,st=0,ti=null,ga=null,wr=[],ip=null;
 
 function $(id){return document.getElementById(id)}
 function ss(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
@@ -294,8 +294,6 @@ async function endGame(){ga=false;clearInterval(ti);const tt=Math.floor((Date.no
   $('resultIcon').textContent=ic;$('resultTitle').textContent=tl;$('resultScore').textContent=sc+' 分';
   $('resultDetail').innerHTML=`👤 ${name}<br>✅ ${cc} / ${qs.length} 題<br>⏱ ${ft(tt)}<br>📊 ${Math.round(cc/qs.length*100)}%`;
   showIPAQ();await saveR(tt);await loadLB();runAI();
-  // Reset move game
-  $('moveBody').classList.remove('open');$('moveSquare').className='move-square gray';$('moveSquare').textContent='🦵';$('moveInstruction').textContent='點下方按鈕開始';$('moveProgressFill').style.width='0%';$('moveDone').style.display='none';$('moveStartBtn').style.display='block';$('moveRetryBtn').style.display='none';$('moveCount').textContent='';$('movePhase').textContent='準備開始...';clearTimeout(mt);
 }
 
 // IPAQ FEEDBACK
@@ -313,28 +311,108 @@ function showIPAQ(){const fb=$('ipaFeedback');if(!ip){fb.style.display='none';re
 async function saveR(tt){if(!supabase)return;try{const d=qs.map(q=>({q:q.q,ca:q.o[q.a]}));const r={player_name:name,score:sc,correct_count:cc,total_questions:qs.length,time_seconds:tt,answers_detail:d,difficulty:'normal'};if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}await supabase.from('pa_game_records').insert(r)}catch(e){console.error(e)}}
 async function loadLB(){const lb=$('leaderboardList');if(!supabase){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">（離線模式）</div>';return}try{const{data,error}=await supabase.from('pa_game_records').select('player_name,score,correct_count,total_questions,time_seconds').order('score',{ascending:false}).order('time_seconds',{ascending:true}).limit(10);if(error)throw error;if(!data||data.length===0){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">尚無記錄，快來挑戰！</div>';return}lb.innerHTML=data.map((r,i)=>{const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);return`<div class="lb-row"><span>${m} <span class="lb-name">${r.player_name}</span></span><span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${ft(r.time_seconds)}</span></div>`}).join('')}catch(e){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">排行榜載入中...</div>'}}
 
-// MOVE GAME
-const MV_PHASES=[{n:'🔴 練習：紅色出現 → 雙腳離地跳！',s:['red','gray','gray','red','gray']},{n:'🔵 練習：藍色出現 → 深蹲！',s:['gray','blue','blue','gray','blue']},{n:'🔥 綜合挑戰：紅跳、藍蹲、灰不動！',s:null}];
+// MOVE GAME - Fullscreen overlay, 3 phases with rule screens
+let mvTimer=null,mvPhase=0,mvIdx=0,mvSeq=[];
+const DISTRACTORS=['green','yellow','green','yellow','green','yellow'];
 
 function toggleMoveGame(){const b=$('moveBody');b.classList.toggle('open')}
-function launchMoveGame(){
-  const b=$('moveBody');b.classList.add('open');
-  const p3=['red','red','red','red','red','blue','blue','blue','blue','blue','gray','gray','gray','gray','gray'];sh(p3);MV_PHASES[2].s=p3;
-  mph=0;mi=0;ms=[];
-  $('moveDone').style.display='none';$('moveStartBtn').style.display='none';$('moveRetryBtn').style.display='none';
-  $('moveSquare').className='move-square gray';$('moveSquare').textContent='🦵';
-  $('moveInstruction').textContent='準備...';$('moveProgressFill').style.width='0%';
-  setTimeout(runPhase,700)
+
+function startMoveOverlay(){
+  const o=$('moveOverlay');o.style.display='block';
+  mvPhase=0;mvIdx=0;showMoveRule()
 }
-function runPhase(){if(mph>=MV_PHASES.length){doneMove();return}const p=MV_PHASES[mph];ms=p.s;mi=0;$('movePhase').textContent=`第 ${mph+1}/3 階段：${p.n}`;$('moveProgressFill').style.width='0%';setTimeout(nextItem,600)}
-function nextItem(){if(mi>=ms.length){mph++;setTimeout(runPhase,500);return}const c=ms[mi];const sq=$('moveSquare'),ins=$('moveInstruction'),pr=$('moveProgressFill');sq.className='move-square';void sq.offsetWidth;
-  if(c==='red'){sq.className='move-square red pop';sq.textContent='🔴';ins.textContent='🔴 跳！雙腳離地！'}
-  else if(c==='blue'){sq.className='move-square blue pop';sq.textContent='🔵';ins.textContent='🔵 蹲！深蹲下去！'}
-  else{sq.className='move-square gray pop';sq.textContent='⬛';ins.textContent='⬛ 不要動～'}
-  pr.style.width=Math.round((mi+1)/ms.length*100)+'%';$('moveCount').textContent=`${mi+1}/${ms.length}`;mi++;
-  mt=setTimeout(()=>{sq.className='move-square gray';sq.textContent='🦵';ins.textContent='...';mt=setTimeout(nextItem,400)},1800)
+
+function showMoveRule(){
+  const div=$('moveOverlayInner');
+  if(mvPhase===0){ // RED rules
+    div.innerHTML=`
+      <div>
+        <div class="move-rule-text">看到 <span class="red">🔴 紅色</span><br>雙腳離地 <span class="red">跳起來！</span></div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，看到其他顏色不要動</div>
+        <div style="margin-top:24px"><button class="move-btn red-btn" onclick="startMovePractice()">開始練習 🔴</button></div>
+      </div>`;
+  }else if(mvPhase===1){ // BLUE rules
+    div.innerHTML=`
+      <div>
+        <div class="move-rule-text">看到 <span class="blue">🔵 藍色</span><br><span class="blue">深蹲</span>下去！</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，看到其他顏色不要動</div>
+        <div style="margin-top:24px"><button class="move-btn blue-btn" onclick="startMovePractice()">開始練習 🔵</button></div>
+      </div>`;
+  }else{ // FINAL challenge
+    div.innerHTML=`
+      <div>
+        <div style="font-size:32px;font-weight:900;background:linear-gradient(135deg,#ff4757,#ffa502,#2ed573,#3742fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">⚡ 終極大挑戰</div>
+        <div style="font-size:15px;color:#8899aa;line-height:1.6">混合 15 題<br>紅色＝跳！藍色＝蹲！<br>黃色／綠色＝<span style="color:#ffa502">站好不要動</span></div>
+        <div style="margin-top:24px"><button class="move-btn green-btn" onclick="startMovePractice()">開始挑戰 💪</button></div>
+      </div>`;
+  }
 }
-function doneMove(){clearTimeout(mt);$('movePhase').textContent='';$('moveCount').textContent='';$('moveInstruction').textContent='';$('moveSquare').className='move-square gray';$('moveSquare').textContent='🏆';$('moveProgressFill').style.width='100%';$('moveDone').style.display='block';$('moveRetryBtn').style.display='block'}
+
+function startMovePractice(){
+  // Generate sequence based on phase
+  if(mvPhase===0){ // RED practice: 5 trials, 2 red + 3 distractors
+    mvSeq=['red','red'];
+    for(let i=0;i<3;i++) mvSeq.push(DISTRACTORS[i%6]);
+    sh(mvSeq);
+  }else if(mvPhase===1){ // BLUE practice: 5 trials, 3 blue + 2 distractors
+    mvSeq=['blue','blue','blue'];
+    for(let i=0;i<2;i++) mvSeq.push(DISTRACTORS[(i+3)%6]);
+    sh(mvSeq);
+  }else{ // FINAL challenge: 15 trials, mix red/blue/distractors
+    mvSeq=[];for(let i=0;i<5;i++)mvSeq.push('red');for(let i=0;i<5;i++)mvSeq.push('blue');for(let i=0;i<5;i++)mvSeq.push(DISTRACTORS[i%6]);sh(mvSeq);
+  }
+  mvIdx=0;
+  showMoveBox();
+}
+
+function showMoveBox(){
+  if(mvIdx>=mvSeq.length){
+    mvPhase++;
+    if(mvPhase>=3){ doneMove();return }
+    showMoveRule();
+    return;
+  }
+  const c=mvSeq[mvIdx];
+  const div=$('moveOverlayInner');
+  const total=mvSeq.length;
+  const pct=Math.round((mvIdx+1)/total*100);
+
+  div.innerHTML=`
+    <div>
+      <div class="move-counter">${mvIdx+1} / ${total}</div>
+      <div class="move-big-square ${c}" id="moveBlink"><span class="emoji"></span></div>
+      <div class="move-progress"><div class="move-progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  // Trigger pop animation
+  setTimeout(()=>{const s=$('moveBlink');if(s)s.classList.add('pop')},50);
+
+  mvIdx++;
+  // Show block for 2.8s, then 0.4s blank, then next
+  mvTimer=setTimeout(()=>{
+    const sq=$('moveBlink');if(sq)sq.classList.remove('pop');
+    div.innerHTML='<div style="color:#222;font-size:60px">·</div>';
+    mvTimer=setTimeout(showMoveBox,350);
+  },2800);
+}
+
+function doneMove(){
+  clearTimeout(mvTimer);
+  const div=$('moveOverlayInner');
+  div.innerHTML=`
+    <div>
+      <div style="font-size:64px">🎉</div>
+      <div class="move-done-msg">太棒了！你完成了！</div>
+      <div class="move-done-sub">25 次反應運動挑戰成功<br>短時間穿插活動就能促進健康<br>每天找空檔動一動，身體感謝你 💪</div>
+      <button class="move-btn green-btn" onclick="closeMoveOverlay()" style="margin-top:20px">回到結果 🔙</button>
+    </div>`;
+}
+
+function closeMoveOverlay(){
+  clearTimeout(mvTimer);
+  $('moveOverlay').style.display='none';
+  $('moveBody').classList.remove('open');
+}
 
 // AI
 async function callAI(sys,msg){try{const r=await fetch(SUPA_URL+'/functions/v1/groq-proxy',{method:'POST',headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({system:sys,message:msg,model:'llama-3.3-70b-versatile',max_tokens:400})});const d=await r.json();return d.content||'AI 暫時無法回應'}catch(e){return'AI 暫時不可用'}}
@@ -351,7 +429,7 @@ async function sendChat(){const inp=$('chatInput');const m=inp.value.trim();if(!
   try{$(lid).textContent=await callAI(sp,m)}catch(e){$(lid).innerHTML='<span class="ai-error">AI 暫時不可用</span>'}ms.scrollTop=ms.scrollHeight}
 
 // RESTART
-function restartGame(){clearInterval(ti);clearTimeout(mt);qi=0;sc=0;cc=0;ga=false;ip=null;wr=[];ss('startScreen');$('playerName').value=''}
+function restartGame(){clearInterval(ti);clearTimeout(mvTimer);$('moveOverlay').style.display='none';$('moveBody').classList.remove('open');qi=0;sc=0;cc=0;ga=false;ip=null;wr=[];ss('startScreen');$('playerName').value=''}
 function shareResult(){const m=`🧠 我在「身體活動知識挑戰」獲得 ${sc} 分！\n✅ ${cc}/${qs.length} 題正確\n你也來挑戰：https://cting2100.github.io/pa-knowledge-quiz/`;if(navigator.share){navigator.share({title:'身體活動知識挑戰',text:m})}else{navigator.clipboard.writeText(m).then(()=>alert('已複製到剪貼簿！'))}}
 $('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')goToSurvey()})
 </script>
