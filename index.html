@@ -146,11 +146,30 @@ input[type=text]:focus { border-color: #7ee8d6; }
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ====== SUPABASE INIT (non-blocking) ======
 const SUPABASE_URL = 'https://kkqsqlwlxeffdoondlcj.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_sQHqEZIyL2fqAnyxpPwVqA_H5T2n2kb';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase = null;
+
+(function loadSupabase() {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  s.onload = function() {
+    try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+    catch(e) { console.warn('Supabase init:', e); }
+  };
+  s.onerror = function() {
+    var s2 = document.createElement('script');
+    s2.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s2.onload = function() {
+      try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+      catch(e) { console.warn('Supabase init fallback:', e); }
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+})();
 
 // ====== QUESTION BANK (based on thesis literature) ======
 const QUESTION_BANK = [
@@ -425,6 +444,7 @@ async function endGame() {
 }
 
 async function saveResult(totalTime) {
+  if (!supabase) { console.warn('Supabase not available, skip save'); return; }
   try {
     const detail = questions.map((q, i) => ({
       question: q.q,
@@ -446,6 +466,10 @@ async function saveResult(totalTime) {
 
 async function loadLeaderboard() {
   const lb = document.getElementById('leaderboardList');
+  if (!supabase) {
+    lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">（離線模式）</div>';
+    return;
+  }
   try {
     const { data, error } = await supabase
       .from('pa_game_records')
