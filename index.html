@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動動腦·身體活動知識挑戰</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  color: #fff; padding: 20px;
+}
+.container {
+  max-width: 640px; width: 100%; background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px); border-radius: 24px; padding: 32px 28px;
+  border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+.screen { display: none; }
+.screen.active { display: block; }
+
+h1 { font-size: 28px; text-align: center; margin-bottom: 6px; font-weight: 800; }
+h2 { font-size: 20px; text-align: center; margin-bottom: 20px; font-weight: 600; color: #7ee8d6; }
+.subtitle { text-align: center; color: #a0b8c8; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+
+input[type=text] {
+  width: 100%; padding: 14px 18px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06); color: #fff; font-size: 18px; outline: none;
+  transition: border 0.3s; text-align: center;
+}
+input[type=text]:focus { border-color: #7ee8d6; }
+
+.btn {
+  display: block; width: 100%; padding: 14px; border-radius: 12px; font-size: 17px;
+  font-weight: 700; cursor: pointer; border: none; transition: all 0.25s;
+  margin-top: 14px; letter-spacing: 1px;
+}
+.btn-primary { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56,239,125,0.3); }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.btn-secondary:hover { background: rgba(255,255,255,0.18); }
+
+.progress-bar {
+  width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: linear-gradient(90deg, #11998e, #38ef7d); border-radius: 3px; transition: width 0.4s; }
+
+.question-number { font-size: 13px; color: #7ee8d6; margin-bottom: 8px; }
+.question-text { font-size: 19px; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  padding: 14px 18px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04); cursor: pointer; transition: all 0.2s;
+  font-size: 16px; position: relative;
+}
+.option:hover { border-color: #7ee8d6; background: rgba(126,232,214,0.1); }
+.option.correct { border-color: #38ef7d; background: rgba(56,239,125,0.2); animation: pulse 0.4s; }
+.option.wrong { border-color: #ff4757; background: rgba(255,71,87,0.2); animation: shake 0.4s; }
+.option.disabled { pointer-events: none; opacity: 0.85; }
+
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+.timer { text-align: center; font-size: 14px; color: #a0b8c8; margin-bottom: 12px; }
+.feedback {
+  text-align: center; padding: 12px; border-radius: 10px; margin: 12px 0;
+  font-weight: 700; font-size: 15px; display: none;
+}
+.feedback.show { display: block; }
+.feedback.correct-fb { background: rgba(56,239,125,0.15); color: #38ef7d; }
+.feedback.wrong-fb { background: rgba(255,71,87,0.15); color: #ff4757; }
+
+.score-display { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px; color: #a0b8c8; }
+.score-display span { font-weight: 700; color: #7ee8d6; }
+
+.result-icon { text-align: center; font-size: 64px; margin: 10px 0; }
+.result-score { text-align: center; font-size: 48px; font-weight: 800; color: #38ef7d; margin: 8px 0; }
+.result-detail { text-align: center; color: #a0b8c8; font-size: 14px; line-height: 1.8; margin-bottom: 16px; }
+
+.leaderboard { margin-top: 20px; }
+.leaderboard h3 { font-size: 16px; color: #7ee8d6; margin-bottom: 10px; text-align: center; }
+.lb-row {
+  display: flex; justify-content: space-between; padding: 10px 14px; border-radius: 8px;
+  margin-bottom: 6px; background: rgba(255,255,255,0.04); font-size: 14px;
+}
+.lb-row:first-child { background: rgba(56,239,125,0.1); border: 1px solid rgba(56,239,125,0.3); }
+.lb-name { font-weight: 600; }
+.lb-score { color: #38ef7d; font-weight: 700; }
+
+.loading { text-align: center; padding: 20px; color: #a0b8c8; }
+.spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #7ee8d6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.small { font-size: 12px; color: #6a8898; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="screen active">
+    <h1>🧠 動動腦</h1>
+    <h2>身體活動知識挑戰</h2>
+    <p class="subtitle">
+      你知道如何聰明地設定運動目標嗎？<br>
+      高強度運動真的比較有效嗎？<br>
+      來挑戰看看你對身體活動的了解！
+    </p>
+    <input type="text" id="playerName" placeholder="請輸入你的名字" maxlength="20" autocomplete="off">
+    <button class="btn btn-primary" onclick="startGame()">開始挑戰 🚀</button>
+    <div class="small">題目來自最新運動科學與健康心理學研究</div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="screen">
+    <div class="score-display">
+      <span>👤 <span id="displayName"></span></span>
+      <span>⭐ <span id="currentScore">0</span> 分</span>
+      <span>⏱ <span id="currentTimer">00:00</span></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="question-number" id="questionNumber"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="screen">
+    <div class="result-icon" id="resultIcon">🏆</div>
+    <h1 id="resultTitle">挑戰完成！</h1>
+    <div class="result-score" id="resultScore">0</div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="leaderboard">
+      <h3>🏅 排行榜 TOP 10</h3>
+      <div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+    <button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
+    <button class="btn btn-secondary" onclick="shareResult()">分享結果 📤</button>
+    <div class="small" style="margin-top:20px">資料儲存於 Supabase · 題目設計參考最新運動科學文獻</div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://kkqsqlwlxeffdoondlcj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sQHqEZIyL2fqAnyxpPwVqA_H5T2n2kb';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ====== QUESTION BANK (based on thesis literature) ======
+const QUESTION_BANK = [
+  {
+    q: '全球約有多少比例的成年人未達建議的身體活動量？',
+    opts: ['15%', '31%', '50%', '70%'],
+    ans: 1,
+    exp: '根據 WHO 2022年統計，全球約31%的成年人身體活動不足（Strain et al., 2024）。'
+  },
+  {
+    q: '根據 Biswas 等人(2025)研究，1分鐘高強度運動(VPA)的健康效益約等於幾分鐘中強度運動(MPA)？',
+    opts: ['2分鐘', '4.1分鐘', '10分鐘', '20分鐘'],
+    ans: 1,
+    exp: 'Biswas et al. (2025) 研究73,485人發現：1分鐘VPA ≈ 4.1分鐘MPA的健康效益。'
+  },
+  {
+    q: 'SMART 目標設定中的「S」代表什麼？',
+    opts: ['簡單 (Simple)', '具體 (Specific)', '強壯 (Strong)', '聰明 (Smart)'],
+    ans: 1,
+    exp: 'SMART：Specific(具體)、Measurable(可測量)、Action-oriented(行動導向)、Realistic(實際可達成)、Timely(有時限)。'
+  },
+  {
+    q: '根據研究，對於「身體活動不足者」，哪種目標設定方式可能更適合？',
+    opts: ['更具體的表現目標', '學習型目標 (Learning Goal)', '越難越好', '不需要設定目標'],
+    ans: 1,
+    exp: '學習型目標強調過程中的學習與技能發展（Seijts & Latham, 2005），更能降低壓力、提升自我效能。'
+  },
+  {
+    q: '雙模理論 (Dual Mode Theory) 是由哪位學者提出的？',
+    opts: ['Bandura', 'Locke', 'Ekkekakis', 'Swann'],
+    ans: 2,
+    exp: 'Ekkekakis (2003) 提出雙模理論，解釋運動強度如何透過認知與生理因素影響情感反應。'
+  },
+  {
+    q: '根據雙模理論，運動強度超過哪個生理指標後，負向情感會顯著增加？',
+    opts: ['最大心率', '換氣閾值 (VT)', '安靜心率', '血壓'],
+    ans: 1,
+    exp: 'Ekkekakis 發現以換氣閾值(VT)為轉折點：低於VT時認知主導、正向情感；高於VT時內感受線索主導，負向情感增加。'
+  },
+  {
+    q: '根據 Kinghorn 等人(2026)研究，下列哪種運動方式的情感反應最佳？',
+    opts: ['30分鐘中等強度運動', '30分鐘連續高強度運動', '10分鐘短時高效高強度運動', '1小時低強度運動'],
+    ans: 2,
+    exp: 'Kinghorn et al. (2026) 發現10分鐘REHIT(短時高效高強度)的情感下降量與中等強度相同，但時間僅1/3！72%受試者偏好此模式。'
+  },
+  {
+    q: '自我效能理論 (Self-Efficacy Theory) 是由哪位學者提出的？',
+    opts: ['Ekkekakis', 'Bandura', 'Locke', 'Swann'],
+    ans: 1,
+    exp: 'Bandura (1977) 提出自我效能理論：個體對自己能否完成某行為的信念，決定其是否採取行動、投入多少努力。'
+  },
+  {
+    q: '根據 Bandura (1977)，提升自我效能「最有效」的方式是什麼？',
+    opts: ['聽別人鼓勵', '觀察他人成功', '自己成功完成（精熟經驗）', '放鬆冥想'],
+    ans: 2,
+    exp: 'Bandura指出「精熟經驗」(mastery experience)是最強的效能來源。自己成功完成任務的經驗最能提升自我效能。'
+  },
+  {
+    q: '台灣成年人每日平均步行約多少步？',
+    opts: ['3,000步', '5,000步', '8,000步', '10,000步'],
+    ans: 1,
+    exp: '根據Althoff et al. (2017)，台灣人每日平均步數約5,000步，不足成年人每日應有的7,000-8,000步。'
+  },
+  {
+    q: '根據 Paluch 等人(2022)統合分析，60歲以下成人每日至少幾步可顯著降低死亡風險？',
+    opts: ['3,000步', '5,000步', '8,000步', '12,000步'],
+    ans: 1,
+    exp: 'Paluch et al. (2022) 發現每日5,000步為60歲以下成人降低全因死亡率的最低有效劑量，效益在8,000-10,000步達高原。'
+  },
+  {
+    q: '學習型目標 (Learning Goal) 的核心精神是什麼？',
+    opts: ['達成特定數字', '學習過程中的技能與策略', '跟別人比賽', '越快完成越好'],
+    ans: 1,
+    exp: 'Seijts & Latham (2005) 強調學習型目標著重「過程中的學習和技能發展」，幫助新手發展多元策略以達成目標。'
+  },
+  {
+    q: '身體活動不足會增加哪種疾病的風險？',
+    opts: ['只有心血管疾病', '只有糖尿病', '慢性病與失智症等多種疾病', '沒有任何影響'],
+    ans: 2,
+    exp: '身體活動不足提高慢性病、代謝疾病、失智症風險。高活動量者認知衰退風險降低38%（Sofi et al., 2011）。'
+  },
+  {
+    q: '什麼是「向上螺旋理論」(Upward Spiral Theory) 的核心概念？',
+    opts: ['負面情緒自我增強', '運動正向情感→資源建構→長期維持', '強度越高效果越好', '休息是最好的策略'],
+    ans: 1,
+    exp: 'Cappellen et al. (2019) 提出：運動中的正向情感會建構生理、認知、心理資源，再放大未來運動的正向情感，形成向上螺旋。'
+  },
+  {
+    q: 'Gay 等人(2017)發現哪種強度的活動存在「補償效應」（工作時增加，非工作時就減少）？',
+    opts: ['中高強度活動 (MVPA)', '輕度活動 (LPA)', '久坐行為', '睡眠'],
+    ans: 1,
+    exp: '輕度活動(LPA)存在顯著補償效應(r=-0.38)；但中高強度活動(MVPA)反而有放大效應(r=0.17)。'
+  },
+  {
+    q: '根據研究，每天僅增加幾分鐘的中高強度活動，就能顯著降低死亡風險？',
+    opts: ['1分鐘', '5分鐘', '30分鐘', '60分鐘'],
+    ans: 1,
+    exp: 'Ekelund et al. (2026) 發現：在活動量最少的20%人群中，每天僅增加5分鐘MVPA即可預防6%的死亡。'
+  },
+  {
+    q: '哪項行為改變技術 (BCT) 被證實是促進身體活動「最有效」的單一技術？',
+    opts: ['目標設定', '自我監控 (Self-monitoring)', '社會支持', '獎勵'],
+    ans: 1,
+    exp: 'Williams & French (2011) 統合分析發現：自我監控是單一最有效BCT（d=0.43）。目標設定加上自我監控效果更大。'
+  },
+  {
+    q: '根據 Stamatakis 等人(2022)，每日幾次1-2分鐘的日常高強度活動(VILPA)就能顯著降低死亡風險？',
+    opts: ['1次', '3次', '10次', '20次'],
+    ans: 1,
+    exp: '每日僅3次×1-2分鐘的日常高強度活動(VILPA)，全因死亡風險降38-40%、CVD死亡風險降48-49%。'
+  },
+  {
+    q: '為什麼對身體活動不足者不建議用SMART目標的原因之一是？',
+    opts: ['SMART太簡單', 'SMART造成壓力與焦慮，降低樂趣', 'SMART完全無效', 'SMART不科學'],
+    ans: 1,
+    exp: 'Hawkins et al. (2024)發現SMART目標對活動不足者造成壓力與焦慮，降低樂趣與自我效能，甚至導致退出。'
+  },
+  {
+    q: '自我效能（Self-Efficacy）在運動行為改變中主要扮演什麼角色？',
+    opts: ['預測天氣', '預測行為啟動與長期堅持', '預測飲食習慣', '預測睡眠品質'],
+    ans: 1,
+    exp: 'McAuley et al. (2011) 發現自我效能一致預測運動的開始與長期維持，是運動行為最可靠的預測因子之一。'
+  }
+];
+
+// ====== GAME STATE ======
+let playerName = '';
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let correctCount = 0;
+let startTime = 0;
+let timerInterval = null;
+let gameActive = false;
+
+// ====== HELPERS ======
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+// ====== START ======
+function startGame() {
+  const nameInput = document.getElementById('playerName');
+  playerName = nameInput.value.trim();
+  if (!playerName) { nameInput.focus(); nameInput.style.borderColor = '#ff4757'; return; }
+
+  questions = shuffle(QUESTION_BANK).slice(0, 10);
+  currentQ = 0;
+  score = 0;
+  correctCount = 0;
+  gameActive = true;
+
+  document.getElementById('displayName').textContent = playerName;
+  document.getElementById('currentScore').textContent = '0';
+  document.getElementById('currentTimer').textContent = '00:00';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('feedback').classList.remove('show', 'correct-fb', 'wrong-fb');
+
+  showScreen('gameScreen');
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+  loadQuestion();
+}
+
+function updateTimer() {
+  if (!gameActive) return;
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  document.getElementById('currentTimer').textContent = formatTime(elapsed);
+}
+
+function loadQuestion() {
+  if (currentQ >= questions.length) { endGame(); return; }
+
+  const q = questions[currentQ];
+  document.getElementById('questionNumber').textContent = `第 ${currentQ + 1} / ${questions.length} 題`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
+  document.getElementById('feedback').classList.remove('show', 'correct-fb', 'wrong-fb');
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.onclick = () => selectAnswer(i);
+    container.appendChild(div);
+  });
+}
+
+function selectAnswer(chosen) {
+  if (!gameActive) return;
+  gameActive = false;
+
+  const q = questions[currentQ];
+  const options = document.querySelectorAll('.option');
+  const speedBonus = Math.max(0, 15 - Math.floor((Date.now() - startTime) / 1000 / currentQ));
+
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === q.ans) opt.classList.add('correct');
+    if (i === chosen && chosen !== q.ans) opt.classList.add('wrong');
+  });
+
+  let points = 0;
+  const fb = document.getElementById('feedback');
+
+  if (chosen === q.ans) {
+    correctCount++;
+    points = 10 + speedBonus;
+    score += points;
+    fb.className = 'feedback show correct-fb';
+    fb.textContent = `✅ 答對了！+${points} 分（含速度加分 +${speedBonus}）`;
+  } else {
+    fb.className = 'feedback show wrong-fb';
+    fb.textContent = `❌ 答錯了！正確答案是：${q.opts[q.ans]}`;
+  }
+
+  document.getElementById('currentScore').textContent = score;
+
+  setTimeout(() => {
+    currentQ++;
+    gameActive = true;
+    document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
+    loadQuestion();
+  }, 1800);
+}
+
+// ====== END GAME ======
+async function endGame() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  const totalTime = Math.floor((Date.now() - startTime) / 1000);
+
+  showScreen('resultScreen');
+
+  let icon = '🏆', title = '太厲害了！';
+  if (correctCount >= 8) { icon = '🎉'; title = '你是身體活動達人！'; }
+  else if (correctCount >= 5) { icon = '💪'; title = '不錯喔！繼續加油！'; }
+  else if (correctCount >= 3) { icon = '📚'; title = '還有很多可以學習的！'; }
+  else { icon = '🌱'; title = '沒關係，學習才剛開始！'; }
+
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScore').textContent = score + ' 分';
+  document.getElementById('resultDetail').innerHTML =
+    `👤 ${playerName}<br>` +
+    `✅ 答對 ${correctCount} / ${questions.length} 題<br>` +
+    `⏱ 花費時間 ${formatTime(totalTime)}<br>` +
+    `📊 正確率 ${Math.round(correctCount / questions.length * 100)}%`;
+
+  // Save to Supabase
+  await saveResult(totalTime);
+  // Load leaderboard
+  await loadLeaderboard();
+}
+
+async function saveResult(totalTime) {
+  try {
+    const detail = questions.map((q, i) => ({
+      question: q.q,
+      correct: q.opts[q.ans]
+    }));
+    await supabase.from('pa_game_records').insert({
+      player_name: playerName,
+      score: score,
+      correct_count: correctCount,
+      total_questions: questions.length,
+      time_seconds: totalTime,
+      answers_detail: detail,
+      difficulty: 'normal'
+    });
+  } catch (e) {
+    console.error('Save error:', e);
+  }
+}
+
+async function loadLeaderboard() {
+  const lb = document.getElementById('leaderboardList');
+  try {
+    const { data, error } = await supabase
+      .from('pa_game_records')
+      .select('player_name, score, correct_count, total_questions, time_seconds')
+      .order('score', { ascending: false })
+      .order('time_seconds', { ascending: true })
+      .limit(10);
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">尚無記錄，快來挑戰！</div>';
+      return;
+    }
+
+    lb.innerHTML = data.map((r, i) => {
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+      return `<div class="lb-row">
+        <span>${medal} <span class="lb-name">${r.player_name}</span></span>
+        <span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${formatTime(r.time_seconds)}</span>
+      </div>`;
+    }).join('');
+
+  } catch (e) {
+    console.error('LB error:', e);
+    lb.innerHTML = '<div style="text-align:center;color:#a0b8c8;padding:10px;">排行榜載入中...</div>';
+  }
+}
+
+function restartGame() {
+  clearInterval(timerInterval);
+  currentQ = 0; score = 0; correctCount = 0; gameActive = false;
+  showScreen('startScreen');
+  document.getElementById('playerName').value = '';
+}
+
+function shareResult() {
+  const msg = `🧠 我在「身體活動知識挑戰」中獲得 ${score} 分！\n✅ ${correctCount}/${questions.length} 題正確\n你也來挑戰看看吧！`;
+  if (navigator.share) {
+    navigator.share({ title: '身體活動知識挑戰', text: msg });
+  } else {
+    navigator.clipboard.writeText(msg).then(() => alert('結果已複製到剪貼簿！'));
+  }
+}
+
+// Enter key to start
+document.getElementById('playerName').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startGame();
+});
+</script>
+</body>
+</html>
