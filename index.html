@@ -393,11 +393,11 @@ function showMoveRule(){
         <div style="font-size:15px;color:#8899aa;line-height:1.6">混合 10 題<br>紅色＝跳！藍色＝蹲！<br>黃色／綠色＝<span style="color:#ffa502">站好不要動</span></div>
         <div style="margin-top:24px"><button class="move-btn green-btn" onclick="startMovePractice()">開始挑戰 💪</button></div>
       </div>`;
-  }else{ // Phase 4: REVERSED rules
+  }else{ // Phase 4: TOGGLE rules
     div.innerHTML=`
       <div>
-        <div class="move-rule-text">⚠️ 規則反轉！<br>看到 <span class="yellow">🟡 黃色</span> → <span class="yellow">深蹲</span><br>看到 <span class="blue">🔵 藍色</span> → <span class="blue">往上跳</span>！</div>
-        <div style="font-size:14px;color:#8899aa;margin-top:10px">10 題，注意顏色跟動作和剛才不一樣！</div>
+        <div class="move-rule-text">⚠️ <b>規則會變！</b><br><br>預設：<span class="red">🔴紅跳</span> <span class="blue">🔵藍蹲</span><br><br>看到 <span class="yellow">🟡 黃色</span> → <b>不動</b><br>但規則 <b>反轉</b>！<br>變成：<span class="red">🔴紅蹲</span> <span class="blue">🔵藍跳</span><br><br>再看到 🟡 → 規則又轉回來！</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">20 題，🟢綠色永遠不動</div>
         <div style="margin-top:24px"><button class="move-btn red-btn" onclick="startMovePractice()">開始挑戰 🔥</button></div>
       </div>`;
   }
@@ -425,14 +425,24 @@ function startMovePractice(){
     for(let i=0;i<r;i++)mvSeq.push('red');
     for(let i=0;i<b;i++)mvSeq.push('blue');
     for(let i=0;i<o;i++)mvSeq.push(allColors[Math.floor(Math.random()*4)]);
-  }else{
-    // Phase 4 reversed: yellow=squat, blue=jump, 10 items
-    // Need yellow and blue mostly, + distractors
-    const y=4,bl=4,o=2;
-    mvSeq=[];
-    for(let i=0;i<y;i++)mvSeq.push('yellow');
-    for(let i=0;i<bl;i++)mvSeq.push('blue');
-    for(let i=0;i<o;i++)mvSeq.push(randExcept(['yellow','blue'],1)[0]);
+  }else{ // Phase 4: TOGGLE rules - yellow toggles, 20 items
+    // ⚠️ 規則反轉 toggle: default red=jump blue=squat, each yellow=toggle
+    // Always start with default rules (no yellow first)
+    // Generate: first item non-yellow, mix of all 4 colors, ~4 yellows
+    const items=[];
+    // Ensure we start without yellow to establish default rules first
+    items.push(['red','blue','green'][Math.floor(Math.random()*3)]);
+    // Generate remaining 19 with mix
+    const colors=['red','red','red','red','blue','blue','blue','blue','green','green','yellow','yellow','yellow','yellow'];
+    while(items.length<20&&colors.length>0){
+      const idx=Math.floor(Math.random()*colors.length);
+      items.push(colors.splice(idx,1)[0]);
+    }
+    // Fill any remaining
+    while(items.length<20)items.push(['red','blue','green'][Math.floor(Math.random()*3)]);
+    mvSeq=items;
+    // Reset toggle state
+    window._moveReversed=false;
   }
   // Shuffle multiple times for true randomness
   for(let i=0;i<3;i++){for(let j=mvSeq.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[mvSeq[j],mvSeq[k]]=[mvSeq[k],mvSeq[j]]}}
@@ -451,6 +461,9 @@ function showMoveBox(){
   const div=$('moveOverlayInner');
   const total=mvSeq.length;
   const pct=Math.round((mvIdx+1)/total*100);
+
+  // Phase 4 toggle logic
+  if(mvPhase===3 && c==='yellow'){ window._moveReversed=!window._moveReversed }
 
   div.innerHTML=`
     <div>
