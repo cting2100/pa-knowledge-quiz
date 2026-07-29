@@ -236,24 +236,10 @@ input[type=text]:focus,input[type=number]:focus{border-color:#7ee8d6}
 </div>
 
 <script>
-(function loadSB(){
-  var s=document.createElement('script');
-  s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  s.onload=function(){try{if(window.supabase)supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}}
-  s.onerror=function(){
-    var s2=document.createElement('script');
-    s2.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    s2.onload=function(){try{if(window.supabase)supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY)}catch(e){}}
-    document.head.appendChild(s2);
-  }
-  document.head.appendChild(s);
-})();
-
 // CONFIG
 const SUPA_URL='https://kkqsqlwlxeffdoondlcj.supabase.co';
 const SUPA_KEY='sb_publishable_sQHqEZIyL2fqAnyxpPwVqA_H5T2n2kb';
 const YT_ID='lSREjKXGbGA';
-let supabase=null;
 
 // MUSIC
 let musicOn=false;
@@ -340,9 +326,24 @@ function showIPAQ(){const fb=$('ipaFeedback');if(!ip){fb.style.display='none';re
   fb.innerHTML=`<h3>📊 你的身體活動評估</h3><div class="ipa-level ${lc}">${ll}</div><div class="ipa-bar"><div class="ipa-bar-fill" style="width:${mpct}%;background:${lc==='high'?'#38ef7d':lc==='moderate'?'#ffa502':'#ff4757'}"></div></div><div class="ipa-detail">每週總活動量：<b>${met} MET-分鐘</b>／WHO 建議 ${wm} MET-分鐘（${mpct}%）</div><div class="ipa-detail" style="margin-top:8px">${gt}</div><div class="ipa-detail" style="margin-top:8px">${sa}</div><div class="ipa-detail" style="margin-top:6px;font-size:11px;color:#5a8898">📎 WHO 2020｜ACSM 2022｜台灣衛福部 7333</div>`
 }
 
-// SUPABASE
-async function saveR(tt){if(!supabase)return;try{const d=qs.map(q=>({q:q.q,ca:q.o[q.a]}));const r={player_name:name,score:sc,correct_count:cc,total_questions:qs.length,time_seconds:tt,answers_detail:d,difficulty:'normal'};if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}await supabase.from('pa_game_records').insert(r)}catch(e){console.error(e)}}
-async function loadLB(){const lb=$('leaderboardList');if(!supabase){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">（離線模式）</div>';return}try{const{data,error}=await supabase.from('pa_game_records').select('player_name,score,correct_count,total_questions,time_seconds').order('score',{ascending:false}).order('time_seconds',{ascending:true}).limit(10);if(error)throw error;if(!data||data.length===0){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">尚無記錄，快來挑戰！</div>';return}lb.innerHTML=data.map((r,i)=>{const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);return`<div class="lb-row"><span>${m} <span class="lb-name">${r.player_name}</span></span><span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${ft(r.time_seconds)}</span></div>`}).join('')}catch(e){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">排行榜載入中...</div>'}}
+// SUPABASE - direct REST API (no SDK dependency)
+const R_URL=SUPA_URL+'/rest/v1/pa_game_records';
+const R_HEADERS={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
+
+async function saveR(tt){
+  const d=qs.map(q=>({q:q.q,ca:q.o[q.a]}));
+  const r={player_name:name,score:sc,correct_count:cc,total_questions:qs.length,time_seconds:tt,answers_detail:d,difficulty:'normal'};
+  if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}
+  try{await fetch(R_URL,{method:'POST',headers:R_HEADERS,body:JSON.stringify(r)})}catch(e){console.error(e)}
+}
+async function loadLB(){
+  const lb=$('leaderboardList');
+  try{
+    const resp=await fetch(R_URL+'?select=player_name,score,correct_count,total_questions,time_seconds&order=score.desc,time_seconds.asc&limit=10',{headers:R_HEADERS});
+    const data=await resp.json();
+    if(!data||data.length===0){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">尚無記錄，快來挑戰！</div>';return}
+    lb.innerHTML=data.map((r,i)=>{const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);return`<div class="lb-row"><span>${m} <span class="lb-name">${r.player_name}</span></span><span class="lb-score">${r.score}分 (${r.correct_count}/${r.total_questions}) ${ft(r.time_seconds)}</span></div>`}).join('')
+  }catch(e){lb.innerHTML='<div style="text-align:center;color:#a0b8c8;padding:10px">排行榜載入中...</div>'}}
 
 // MOVE GAME - Fullscreen overlay, 3 phases with rule screens
 let mvTimer=null,mvPhase=0,mvIdx=0,mvSeq=[];
