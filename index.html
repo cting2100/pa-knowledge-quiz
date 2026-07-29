@@ -151,6 +151,29 @@ input[type=text]:focus { border-color: #7ee8d6; }
 .ipa-detail { font-size: 13px; color: #a0b8c8; line-height: 1.6; }
 .ipa-bar { height: 8px; border-radius: 4px; margin: 10px 0; background: rgba(255,255,255,0.1); overflow: hidden; }
 .ipa-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
+/* ====== MOVE GAME ====== */
+.move-container { text-align: center; padding: 10px 0; }
+.move-phase { font-size: 14px; color: #7ee8d6; margin-bottom: 4px; }
+.move-count { font-size: 13px; color: #a0b8c8; margin-bottom: 16px; }
+.move-instruction { font-size: 22px; font-weight: 800; min-height: 36px; margin-bottom: 12px; transition: all 0.2s; }
+.move-square {
+  width: 180px; height: 180px; margin: 0 auto 20px; border-radius: 24px;
+  background: #555; transition: background 0.15s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; font-weight: 900;
+}
+.move-square.show { animation: popIn 0.3s ease-out; }
+@keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+.move-square.red { background: #ff4757; box-shadow: 0 0 60px rgba(255,71,87,0.6); }
+.move-square.blue { background: #3742fa; box-shadow: 0 0 60px rgba(55,66,250,0.6); }
+.move-square.gray { background: #555; }
+.move-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 10px 0; overflow: hidden; }
+.move-progress-fill { height: 100%; background: #38ef7d; border-radius: 3px; transition: width 0.3s; }
+.move-result { font-size: 36px; font-weight: 800; color: #38ef7d; margin: 16px 0; }
+.move-complete-msg { font-size: 15px; color: #a0b8c8; line-height: 1.6; }
+.move-legend { display: flex; gap: 16px; justify-content: center; margin-bottom: 16px; font-size: 13px; color: #a0b8c8; }
+.move-legend span { display: flex; align-items: center; gap: 6px; }
+.move-legend .dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
 </style>
 </head>
 <body>
@@ -243,6 +266,7 @@ input[type=text]:focus { border-color: #7ee8d6; }
       <div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div>
     </div>
     <button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
+    <button class="btn btn-primary" onclick="startMoveGame()" style="background:linear-gradient(135deg,#ff4757,#ff6b81);">🦵 大家動一動！</button>
     <button class="btn btn-secondary" onclick="shareResult()">分享結果 📤</button>
     <button class="btn btn-secondary" onclick="openAICoach()" style="background:linear-gradient(135deg,#614385,#516395);color:#fff;">🤖 AI 知識教練</button>
     <div class="ai-panel" id="aiAnalysis" style="display:none">
@@ -250,6 +274,25 @@ input[type=text]:focus { border-color: #7ee8d6; }
       <div class="ai-content" id="aiAnalysisContent"><span class="ai-typing">分析中...</span></div>
     </div>
     <div class="small" style="margin-top:20px">資料儲存於 Supabase · AI分析由 Groq 提供</div>
+  </div>
+
+  <!-- MOVE GAME SCREEN -->
+  <div id="moveScreen" class="screen">
+    <div class="move-container">
+      <div class="move-phase" id="movePhase"></div>
+      <div class="move-count" id="moveCount"></div>
+      <div class="move-instruction" id="moveInstruction"></div>
+      <div class="move-legend">
+        <span><span class="dot" style="background:#ff4757"></span> 🔴 雙腳跳</span>
+        <span><span class="dot" style="background:#3742fa"></span> 🔵 深蹲</span>
+        <span><span class="dot" style="background:#555"></span> ⬛ 不動</span>
+      </div>
+      <div class="move-square" id="moveSquare"></div>
+      <div class="move-progress"><div class="move-progress-fill" id="moveProgressFill" style="width:0%"></div></div>
+      <div class="move-result" id="moveResult" style="display:none"></div>
+      <div class="move-complete-msg" id="moveCompleteMsg" style="display:none"></div>
+      <button class="btn btn-primary" id="moveBackBtn" style="display:none" onclick="backToResult()">回到結果 🔙</button>
+    </div>
   </div>
 
 </div>
@@ -884,6 +927,122 @@ async function sendChat() {
     document.getElementById(loadingId).innerHTML = '<span class="ai-error">AI 暫時無法回應</span>';
   }
   chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
+
+// ====== MOVE GAME ======
+let moveTimer = null;
+let moveSeq = [];
+let moveIdx = 0;
+let movePhaseIdx = 0;
+let moveTotal = 0;
+const MOVE_PHASES = [
+  { name: '🔴 練習：看到紅色 → 雙腳離地跳！', phases: ['red','gray','gray','red','gray'] },
+  { name: '🔵 練習：看到藍色 → 深蹲！',    phases: ['gray','blue','blue','gray','blue'] },
+  { name: '🔥 綜合挑戰！',                  phases: null }
+];
+
+function startMoveGame() {
+  // Phase 3: generate 15-trial sequence with 5 red, 5 blue, 5 other
+  const phase3seq = ['red','red','red','red','red',
+                     'blue','blue','blue','blue','blue',
+                     'gray','gray','gray','gray','gray'];
+  shuffle(phase3seq);
+  MOVE_PHASES[2].phases = phase3seq;
+
+  movePhaseIdx = 0;
+  moveIdx = 0;
+  moveSeq = [];
+
+  document.getElementById('moveResult').style.display = 'none';
+  document.getElementById('moveCompleteMsg').style.display = 'none';
+  document.getElementById('moveBackBtn').style.display = 'none';
+  showScreen('moveScreen');
+  runPhase();
+}
+
+function runPhase() {
+  if (movePhaseIdx >= MOVE_PHASES.length) {
+    completeMoveGame();
+    return;
+  }
+  const phase = MOVE_PHASES[movePhaseIdx];
+  moveSeq = phase.phases;
+  moveIdx = 0;
+  moveTotal = moveSeq.length;
+
+  document.getElementById('movePhase').textContent =
+    `第 ${movePhaseIdx+1} / ${MOVE_PHASES.length} 階段`;
+  document.getElementById('moveSquare').className = 'move-square gray';
+  document.getElementById('moveInstruction').textContent = '準備...';
+  document.getElementById('moveProgressFill').style.width = '0%';
+
+  setTimeout(() => nextMoveItem(), 800);
+}
+
+function nextMoveItem() {
+  if (moveIdx >= moveTotal) {
+    movePhaseIdx++;
+    setTimeout(() => runPhase(), 600);
+    return;
+  }
+
+  const color = moveSeq[moveIdx];
+  const square = document.getElementById('moveSquare');
+  const inst = document.getElementById('moveInstruction');
+  const progress = document.getElementById('moveProgressFill');
+
+  // Remove animation class, then re-add
+  square.className = 'move-square';
+  void square.offsetWidth; // reflow
+
+  if (color === 'red') {
+    square.className = 'move-square red show';
+    inst.textContent = '🔴 跳！雙腳離地！';
+  } else if (color === 'blue') {
+    square.className = 'move-square blue show';
+    inst.textContent = '🔵 蹲！深蹲下去！';
+  } else {
+    square.className = 'move-square gray show';
+    inst.textContent = '⬛ 不要動～';
+  }
+
+  const pct = Math.round((moveIdx + 1) / moveTotal * 100);
+  progress.style.width = pct + '%';
+  document.getElementById('moveCount').textContent =
+    `${moveIdx+1} / ${moveTotal}`;
+
+  moveIdx++;
+
+  // Show for 2.5s, then pause 0.8s, then next
+  moveTimer = setTimeout(() => {
+    square.className = 'move-square gray';
+    inst.textContent = '...';
+    moveTimer = setTimeout(() => nextMoveItem(), 500);
+  }, 2000);
+}
+
+function completeMoveGame() {
+  clearTimeout(moveTimer);
+  document.getElementById('movePhase').textContent = '';
+  document.getElementById('moveCount').textContent = '';
+  document.getElementById('moveInstruction').textContent = '';
+  document.getElementById('moveSquare').className = 'move-square gray';
+  document.getElementById('moveProgressFill').style.width = '100%';
+
+  document.getElementById('moveResult').style.display = 'block';
+  document.getElementById('moveResult').textContent = '🎉 太棒了！';
+  document.getElementById('moveCompleteMsg').style.display = 'block';
+  document.getElementById('moveCompleteMsg').innerHTML =
+    '你剛剛完成了 25 次反應運動！<br>' +
+    '科學研究說：短時間的穿插式活動就能促進健康。<br>' +
+    '每天找幾個空檔動一動，身體會感謝你 💪';
+  document.getElementById('moveBackBtn').style.display = 'block';
+}
+
+function backToResult() {
+  clearTimeout(moveTimer);
+  document.getElementById('moveSquare').className = 'move-square gray';
+  showScreen('resultScreen');
 }
 </script>
 </body>
