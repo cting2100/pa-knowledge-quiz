@@ -129,6 +129,28 @@ input[type=text]:focus { border-color: #7ee8d6; }
 .chat-input-row { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; }
 .chat-input-row input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; outline: none; }
 .chat-input-row button { padding: 10px 18px; border-radius: 10px; border: none; background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; font-weight: 700; cursor: pointer; }
+/* IPAQ SURVEY */
+.survey-q { margin-bottom: 20px; }
+.survey-q label { display: block; font-size: 14px; color: #a0b8c8; margin-bottom: 6px; }
+.survey-q .q-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.survey-row { display: flex; gap: 12px; }
+.survey-field { flex: 1; }
+.survey-field span { display: block; font-size: 12px; color: #6a8898; margin-bottom: 4px; }
+.survey-field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; outline: none; text-align: center; }
+.survey-hint { font-size: 11px; color: #5a7888; margin-top: 4px; }
+.ipa-feedback-card {
+  margin: 14px 0; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0,180,140,0.12), rgba(56,239,125,0.08));
+  border: 1px solid rgba(56,239,125,0.25);
+}
+.ipa-feedback-card h3 { font-size: 15px; margin-bottom: 8px; }
+.ipa-level { font-size: 22px; font-weight: 800; margin: 4px 0; }
+.ipa-level.low { color: #ff4757; }
+.ipa-level.moderate { color: #ffa502; }
+.ipa-level.high { color: #38ef7d; }
+.ipa-detail { font-size: 13px; color: #a0b8c8; line-height: 1.6; }
+.ipa-bar { height: 8px; border-radius: 4px; margin: 10px 0; background: rgba(255,255,255,0.1); overflow: hidden; }
+.ipa-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
 </style>
 </head>
 <body>
@@ -144,8 +166,55 @@ input[type=text]:focus { border-color: #7ee8d6; }
       來挑戰看看你對身體活動的了解！
     </p>
     <input type="text" id="playerName" placeholder="請輸入你的名字" maxlength="20" autocomplete="off">
-    <button class="btn btn-primary" onclick="startGame()">開始挑戰 🚀</button>
+    <button class="btn btn-primary" onclick="goToSurvey()">開始挑戰 🚀</button>
     <div class="small">題目來自最新運動科學與健康心理學研究</div>
+  </div>
+
+  <!-- IPAQ SURVEY SCREEN -->
+  <div id="surveyScreen" class="screen">
+    <h2>📋 日常身體活動小調查</h2>
+    <p class="subtitle">回答以下7題，了解你的活動狀況<br>（改編自國際身體活動量表短版 IPAQ-SF）</p>
+
+    <div class="survey-q">
+      <div class="q-title">1. 過去7天，你有幾天做「高強度」身體活動？</div>
+      <label>（如跑步、快速騎車、搬重物、球類競賽—會讓你呼吸明顯急促）</label>
+      <div class="survey-row">
+        <div class="survey-field"><span>天數/週</span><input type="number" id="vpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
+        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="vpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
+      </div>
+    </div>
+
+    <div class="survey-q">
+      <div class="q-title">2. 過去7天，你有幾天做「中等強度」身體活動？</div>
+      <label>（如快走、騎車通勤、打掃、搬輕物—會讓你呼吸稍快）</label>
+      <div class="survey-row">
+        <div class="survey-field"><span>天數/週</span><input type="number" id="mpaDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
+        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="mpaMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
+      </div>
+    </div>
+
+    <div class="survey-q">
+      <div class="q-title">3. 過去7天，你有幾天「走路」至少10分鐘？</div>
+      <label>（含通勤、逛街、遛狗等任何走路）</label>
+      <div class="survey-row">
+        <div class="survey-field"><span>天數/週</span><input type="number" id="walkDays" min="0" max="7" value="0" onchange="updateSurveyPreview()"></div>
+        <div class="survey-field"><span>每天約幾分鐘</span><input type="number" id="walkMins" min="0" max="480" value="0" onchange="updateSurveyPreview()"></div>
+      </div>
+    </div>
+
+    <div class="survey-q">
+      <div class="q-title">4. 過去7天，平日一天你大約「坐著」多少時間？</div>
+      <label>（含工作、通勤、看電視、用電腦等）</label>
+      <div class="survey-field"><span>小時/天</span><input type="number" id="sitHours" min="0" max="24" value="0" onchange="updateSurveyPreview()"></div>
+    </div>
+
+    <div class="ai-panel" id="surveyPreview" style="display:none">
+      <h3>📊 預估</h3>
+      <div class="ai-content" id="surveyPreviewText"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="startGame()">開始答題 🎯</button>
+    <button class="btn btn-secondary" onclick="skipSurvey()">跳過調查，直接挑戰</button>
   </div>
 
   <!-- GAME SCREEN -->
@@ -168,6 +237,7 @@ input[type=text]:focus { border-color: #7ee8d6; }
     <h1 id="resultTitle">挑戰完成！</h1>
     <div class="result-score" id="resultScore">0</div>
     <div class="result-detail" id="resultDetail"></div>
+    <div class="ipa-feedback-card" id="ipaFeedback"></div>
     <div class="leaderboard">
       <h3>🏅 排行榜 TOP 10</h3>
       <div id="leaderboardList"><div class="loading"><div class="spinner"></div></div></div>
@@ -361,6 +431,7 @@ let timerInterval = null;
 let gameActive = false;
 let wrongQuestions = [];
 let aiChatHistory = [];
+let ipaqData = null; // { vpaDays, vpaMins, mpaDays, mpaMins, walkDays, walkMins, sitHours }
 
 // ====== HELPERS ======
 function showScreen(id) {
@@ -384,28 +455,87 @@ function formatTime(s) {
 }
 
 // ====== START ======
-function startGame() {
+function goToSurvey() {
   const nameInput = document.getElementById('playerName');
   playerName = nameInput.value.trim();
   if (!playerName) { nameInput.focus(); nameInput.style.borderColor = '#ff4757'; return; }
+  nameInput.style.borderColor = '';
+  showScreen('surveyScreen');
+}
 
+function skipSurvey() {
+  ipaqData = null;
   questions = shuffle(QUESTION_BANK).slice(0, 10);
-  currentQ = 0;
-  score = 0;
-  correctCount = 0;
-  wrongQuestions = [];
+  currentQ = 0; score = 0; correctCount = 0; wrongQuestions = [];
   gameActive = true;
+  initGameScreen();
+  showScreen('gameScreen');
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+  loadQuestion();
+}
 
+function updateSurveyPreview() {
+  const d = readIpaqForm();
+  if (!d) return;
+  const met = calcMET(d);
+  const level = getActivityLevel(met, d);
+  const preview = document.getElementById('surveyPreview');
+  const text = document.getElementById('surveyPreviewText');
+  if (met === 0) { preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+  const label = level === 'high' ? '🏃 高度活躍' : level === 'moderate' ? '🚶 中度活躍' : '🪑 低度活躍';
+  text.textContent = `總活動量約 ${met} MET-分鐘/週 → ${label}\n每日久坐約 ${d.sitHours} 小時`;
+}
+
+function startGame() {
+  const d = readIpaqForm();
+  ipaqData = d;
+  questions = shuffle(QUESTION_BANK).slice(0, 10);
+  currentQ = 0; score = 0; correctCount = 0; wrongQuestions = [];
+  gameActive = true;
+  initGameScreen();
+  showScreen('gameScreen');
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+  loadQuestion();
+}
+
+function initGameScreen() {
   document.getElementById('displayName').textContent = playerName;
   document.getElementById('currentScore').textContent = '0';
   document.getElementById('currentTimer').textContent = '00:00';
   document.getElementById('progressFill').style.width = '0%';
   document.getElementById('feedback').classList.remove('show', 'correct-fb', 'wrong-fb');
+}
 
-  showScreen('gameScreen');
-  startTime = Date.now();
-  timerInterval = setInterval(updateTimer, 1000);
-  loadQuestion();
+function readIpaqForm() {
+  const vpaDays = parseInt(document.getElementById('vpaDays').value) || 0;
+  const vpaMins = parseInt(document.getElementById('vpaMins').value) || 0;
+  const mpaDays = parseInt(document.getElementById('mpaDays').value) || 0;
+  const mpaMins = parseInt(document.getElementById('mpaMins').value) || 0;
+  const walkDays = parseInt(document.getElementById('walkDays').value) || 0;
+  const walkMins = parseInt(document.getElementById('walkMins').value) || 0;
+  const sitHours = parseInt(document.getElementById('sitHours').value) || 0;
+  return { vpaDays, vpaMins, mpaDays, mpaMins, walkDays, walkMins, sitHours };
+}
+
+function calcMET(d) {
+  const walkMET = 3.3 * d.walkMins * d.walkDays;
+  const mpaMET = 4.0 * d.mpaMins * d.mpaDays;
+  const vpaMET = 8.0 * d.vpaMins * d.vpaDays;
+  return Math.round(walkMET + mpaMET + vpaMET);
+}
+
+function getActivityLevel(totalMET, d) {
+  const vpaDaysOk = d.vpaDays >= 3 && d.vpaMins >= 20;
+  const modDaysOk = (d.mpaDays + d.walkDays) >= 5 && ((d.mpaMins * d.mpaDays + d.walkMins * d.walkDays) / Math.max(1, d.mpaDays + d.walkDays)) >= 30;
+  const anyCombo = totalMET >= 600;
+  const vpaHigh = d.vpaDays >= 3 && totalMET >= 1500;
+  const anyHigh = (d.vpaDays + d.mpaDays + d.walkDays) >= 7 && totalMET >= 3000;
+  if (vpaHigh || anyHigh) return 'high';
+  if (vpaDaysOk || modDaysOk || anyCombo) return 'moderate';
+  return 'low';
 }
 
 function updateTimer() {
@@ -505,8 +635,69 @@ async function endGame() {
   await saveResult(totalTime);
   // Load leaderboard
   await loadLeaderboard();
+  // IPAQ feedback
+  showIPAQFeedback();
   // Trigger AI analysis
   runAIAnalysis();
+}
+
+// ====== IPAQ FEEDBACK (WHO/ACSM/衛福部 guidelines) ======
+function showIPAQFeedback() {
+  const fb = document.getElementById('ipaFeedback');
+  if (!ipaqData) {
+    fb.style.display = 'none';
+    return;
+  }
+  const met = calcMET(ipaqData);
+  const level = getActivityLevel(met, ipaqData);
+  fb.style.display = 'block';
+
+  // Guideline targets
+  const whoMPA = 150;   // min/week moderate
+  const whoVPA = 75;    // min/week vigorous
+  const whoMET = 600;   // MET-min/week
+  const taiwanDays = 3; // 7333
+  const taiwanMins = 30;
+
+  const sitAdvice = ipaqData.sitHours >= 8
+    ? `⚠️ 你每日久坐 ${ipaqData.sitHours} 小時，超過8小時，建議每30分鐘起身活動一下。`
+    : ipaqData.sitHours >= 6
+    ? `⚡ 你每日久坐 ${ipaqData.sitHours} 小時，接近警戒值。記得定時起身走動。`
+    : `✅ 你每日久坐 ${ipaqData.sitHours} 小時，狀況不錯！`;
+
+  const metPct = Math.min(100, Math.round(met / whoMET * 100));
+
+  let levelLabel, levelClass, guidelineText;
+  if (level === 'high') {
+    levelLabel = '🏃 高度活躍';
+    levelClass = 'high';
+    guidelineText = `太棒了！你每週總活動量約 <b>${met} MET-分鐘</b>，已達到 WHO 建議的 ${whoMET} MET-分鐘標準（達成率 ${metPct}%），也符合我國衛福部每週3次、每次30分鐘的建議。繼續保持！`;
+  } else if (level === 'moderate') {
+    levelLabel = '🚶 中度活躍';
+    levelClass = 'moderate';
+    const gapMET = Math.max(0, whoMET - met);
+    const gapMins = Math.round(gapMET / 4.0);
+    guidelineText = `你每週總活動量約 <b>${met} MET-分鐘</b>，已達 WHO 最低標準（達成率 ${metPct}%）。若要更健康，建議再增加約 <b>${gapMins} 分鐘</b>的中強度活動（如快走），或 ${Math.round(gapMET/8)} 分鐘的高強度運動。`;
+  } else {
+    levelLabel = '🪑 低度活躍';
+    levelClass = 'low';
+    const gapMET = whoMET - met;
+    const gapMins = Math.round(gapMET / 4.0);
+    const gapVPA = Math.round(gapMET / 8.0);
+    guidelineText = `你每週總活動量約 <b>${met} MET-分鐘</b>，尚未達到 WHO 建議的 ${whoMET} MET-分鐘標準（達成率 ${metPct}%）。建議每週增加約 <b>${gapMins} 分鐘</b>中等強度活動（如快走、騎車通勤），或 <b>${gapVPA} 分鐘</b>高強度運動。即使每天多走5分鐘也有幫助！`;
+  }
+
+  fb.innerHTML = `
+    <h3>📊 你的身體活動評估</h3>
+    <div class="ipa-level ${levelClass}">${levelLabel}</div>
+    <div class="ipa-bar"><div class="ipa-bar-fill" style="width:${metPct}%;background:${level==='high'?'#38ef7d':level==='moderate'?'#ffa502':'#ff4757'}"></div></div>
+    <div class="ipa-detail">每週總活動量：<b>${met} MET-分鐘</b> / WHO建議 ${whoMET} MET-分鐘（達成率 ${metPct}%）</div>
+    <div class="ipa-detail" style="margin-top:8px">${guidelineText}</div>
+    <div class="ipa-detail" style="margin-top:8px">${sitAdvice}</div>
+    <div class="ipa-detail" style="margin-top:6px;font-size:11px;color:#5a7888;">
+      參考標準：WHO 2020 | ACSM 2022 | 衛生福利部國民健康署「7333」每週3次、每次30分鐘、心跳130
+    </div>
+  `;
 }
 
 async function saveResult(totalTime) {
@@ -516,7 +707,7 @@ async function saveResult(totalTime) {
       question: q.q,
       correct: q.opts[q.ans]
     }));
-    await supabase.from('pa_game_records').insert({
+    const record = {
       player_name: playerName,
       score: score,
       correct_count: correctCount,
@@ -524,7 +715,14 @@ async function saveResult(totalTime) {
       time_seconds: totalTime,
       answers_detail: detail,
       difficulty: 'normal'
-    });
+    };
+    if (ipaqData) {
+      const met = calcMET(ipaqData);
+      record.ipaq_data = ipaqData;
+      record.activity_level = getActivityLevel(met, ipaqData);
+      record.total_met = met;
+    }
+    await supabase.from('pa_game_records').insert(record);
   } catch (e) {
     console.error('Save error:', e);
   }
@@ -567,8 +765,11 @@ async function loadLeaderboard() {
 function restartGame() {
   clearInterval(timerInterval);
   currentQ = 0; score = 0; correctCount = 0; gameActive = false;
+  ipaqData = null; wrongQuestions = [];
   showScreen('startScreen');
   document.getElementById('playerName').value = '';
+  document.getElementById('ipaFeedback').innerHTML = '';
+  document.getElementById('aiAnalysis').style.display = 'none';
 }
 
 function shareResult() {
