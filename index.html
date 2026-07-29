@@ -312,7 +312,11 @@ async function endGame(){ga=false;clearInterval(ti);const tt=Math.floor((Date.no
   let ic='🏆',tl='太厲害了！';if(cc>=8){ic='🎉';tl='你是身體活動達人！'}else if(cc>=5){ic='💪';tl='不錯喔！'}else if(cc>=3){ic='📚';tl='還有很多可以學習的！'}else{ic='🌱';tl='學習才剛開始！'}
   $('resultIcon').textContent=ic;$('resultTitle').textContent=tl;$('resultScore').textContent=sc+' 分';
   $('resultDetail').innerHTML=`👤 ${name}<br>✅ ${cc} / ${qs.length} 題<br>⏱ ${ft(tt)}<br>📊 ${Math.round(cc/qs.length*100)}%`;
-  showIPAQ();await saveR(tt);await loadLB();runAI();
+  try{showIPAQ()}catch(e){}
+  // Always save - fire & forget
+  saveR(tt);
+  loadLB();
+  try{runAI()}catch(e){}
 }
 
 // IPAQ FEEDBACK
@@ -331,10 +335,16 @@ const R_URL=SUPA_URL+'/rest/v1/pa_game_records';
 const R_HEADERS={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
 
 async function saveR(tt){
-  const d=qs.map(q=>({q:q.q,ca:q.o[q.a]}));
-  const r={player_name:name,score:sc,correct_count:cc,total_questions:qs.length,time_seconds:tt,answers_detail:d,difficulty:'normal'};
-  if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}
-  try{await fetch(R_URL,{method:'POST',headers:R_HEADERS,body:JSON.stringify(r)})}catch(e){console.error(e)}
+  try{
+    const r={
+      player_name:name,score:sc,correct_count:cc,
+      total_questions:qs.length,time_seconds:tt,difficulty:'normal'
+    };
+    if(ip){r.ipaq_data=ip;r.activity_level=getLevel(calcMET(ip),ip);r.total_met=calcMET(ip)}
+    console.log('saving to supabase...',r);
+    const resp=await fetch(R_URL,{method:'POST',headers:R_HEADERS,body:JSON.stringify(r)});
+    console.log('supabase response:',resp.status);
+  }catch(e){console.error('save error:',e)}
 }
 async function loadLB(){
   const lb=$('leaderboardList');
