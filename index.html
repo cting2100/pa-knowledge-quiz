@@ -96,6 +96,39 @@ input[type=text]:focus { border-color: #7ee8d6; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .small { font-size: 12px; color: #6a8898; text-align: center; margin-top: 16px; }
+/* ====== AI PANEL ====== */
+.ai-panel {
+  margin: 16px 0; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(102,51,153,0.15), rgba(72,52,212,0.15));
+  border: 1px solid rgba(126,232,214,0.2);
+}
+.ai-panel h3 { color: #b794f4; font-size: 15px; margin-bottom: 8px; }
+.ai-content { font-size: 14px; color: #d0c8e8; line-height: 1.7; white-space: pre-wrap; }
+.ai-typing { color: #7ee8d6; font-size: 13px; }
+.ai-error { color: #ff6b6b; font-size: 13px; }
+/* CHAT */
+.chat-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.chat-box {
+  width: 90%; max-width: 500px; max-height: 80vh; background: #1a2a3a;
+  border-radius: 18px; border: 1px solid rgba(126,232,214,0.3);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.chat-header {
+  padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.chat-header span { font-weight: 700; color: #7ee8d6; }
+.chat-close { background: none; border: none; color: #a0b8c8; font-size: 20px; cursor: pointer; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
+.chat-msg.ai { background: rgba(72,52,212,0.3); align-self: flex-start; color: #d0c8e8; }
+.chat-msg.user { background: rgba(56,239,125,0.2); align-self: flex-end; color: #fff; }
+.chat-input-row { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; }
+.chat-input-row input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; outline: none; }
+.chat-input-row button { padding: 10px 18px; border-radius: 10px; border: none; background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -141,9 +174,31 @@ input[type=text]:focus { border-color: #7ee8d6; }
     </div>
     <button class="btn btn-primary" onclick="restartGame()">再玩一次 🔄</button>
     <button class="btn btn-secondary" onclick="shareResult()">分享結果 📤</button>
-    <div class="small" style="margin-top:20px">資料儲存於 Supabase · 題目設計參考最新運動科學文獻</div>
+    <button class="btn btn-secondary" onclick="openAICoach()" style="background:linear-gradient(135deg,#614385,#516395);color:#fff;">🤖 AI 知識教練</button>
+    <div class="ai-panel" id="aiAnalysis" style="display:none">
+      <h3>🤖 AI 個人化運動分析</h3>
+      <div class="ai-content" id="aiAnalysisContent"><span class="ai-typing">分析中...</span></div>
+    </div>
+    <div class="small" style="margin-top:20px">資料儲存於 Supabase · AI分析由 Groq 提供</div>
   </div>
 
+</div>
+
+<!-- AI CHAT MODAL -->
+<div id="chatModal" class="chat-modal" style="display:none" onclick="if(event.target===this)closeAICoach()">
+  <div class="chat-box">
+    <div class="chat-header">
+      <span>🤖 AI 運動知識教練</span>
+      <button class="chat-close" onclick="closeAICoach()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg ai">哈囉！我是你的AI運動知識教練。你可以問我任何關於身體活動、目標設定、運動強度、自我效能等相關問題喔！💪</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="問我任何身體活動的問題..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">發送</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -304,6 +359,8 @@ let correctCount = 0;
 let startTime = 0;
 let timerInterval = null;
 let gameActive = false;
+let wrongQuestions = [];
+let aiChatHistory = [];
 
 // ====== HELPERS ======
 function showScreen(id) {
@@ -336,6 +393,7 @@ function startGame() {
   currentQ = 0;
   score = 0;
   correctCount = 0;
+  wrongQuestions = [];
   gameActive = true;
 
   document.getElementById('displayName').textContent = playerName;
@@ -402,6 +460,12 @@ function selectAnswer(chosen) {
   } else {
     fb.className = 'feedback show wrong-fb';
     fb.textContent = `❌ 答錯了！正確答案是：${q.opts[q.ans]}`;
+    wrongQuestions.push({
+      question: q.q,
+      yourAnswer: q.opts[chosen],
+      correctAnswer: q.opts[q.ans],
+      explanation: q.exp
+    });
   }
 
   document.getElementById('currentScore').textContent = score;
@@ -441,6 +505,8 @@ async function endGame() {
   await saveResult(totalTime);
   // Load leaderboard
   await loadLeaderboard();
+  // Trigger AI analysis
+  runAIAnalysis();
 }
 
 async function saveResult(totalTime) {
@@ -518,6 +584,108 @@ function shareResult() {
 document.getElementById('playerName').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') startGame();
 });
+
+// ====== AI FUNCTIONS (via Supabase Edge Function) ======
+async function callGroq(systemPrompt, userMessage) {
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/groq-proxy`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      system: systemPrompt,
+      message: userMessage,
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 600
+    })
+  });
+  if (!resp.ok) throw new Error('API error');
+  const data = await resp.json();
+  return data.content || '抱歉，AI暫時無法回應，請稍後再試。';
+}
+
+async function runAIAnalysis() {
+  const panel = document.getElementById('aiAnalysis');
+  const content = document.getElementById('aiAnalysisContent');
+  if (wrongQuestions.length === 0) {
+    panel.style.display = 'block';
+    content.innerHTML = '🎉 你全部答對了！你已經掌握了身體活動的核心知識，繼續保持運動習慣、跟身邊的人分享這些重要觀念吧！';
+    return;
+  }
+  panel.style.display = 'block';
+  content.innerHTML = '<span class="ai-typing">🤖 AI 正在分析你的作答...</span>';
+
+  const wrongSummary = wrongQuestions.map((w, i) =>
+    `第${i+1}題：${w.question}\n我選了：${w.yourAnswer}\n正確答案：${w.correctAnswer}`
+  ).join('\n\n');
+
+  const prompt = `你是一位專業的運動科學與健康心理學專家。以下是一位台灣使用者玩身體活動知識測驗的結果：
+- 答對：${correctCount}/${questions.length} 題
+- 答錯的題目如下：
+
+${wrongSummary}
+
+請用繁體中文，以溫暖、鼓勵的口吻，給使用者：
+1. 一句整體鼓勵（一兩句）
+2. 針對他答錯的題目，簡短解釋正確概念（2-3個重點）
+3. 給他一個具體的、今天就可以開始做的運動小建議（結合他的知識缺口來建議）
+總共控制在200字以內，格式用自然的段落呈現，不要用編號。`;
+
+  try {
+    const aiText = await callGroq(
+      '你是專業的運動科學與健康心理學專家，擅長用白話、溫暖的方式解釋專業知識。請用繁體中文回應。',
+      prompt
+    );
+    content.textContent = aiText;
+  } catch (e) {
+    content.innerHTML = '<span class="ai-error">AI 分析暫時不可用，請稍後再試</span>';
+  }
+}
+
+// ====== AI CHAT COACH ======
+function openAICoach() {
+  document.getElementById('chatModal').style.display = 'flex';
+  document.getElementById('chatInput').focus();
+}
+
+function closeAICoach() {
+  document.getElementById('chatModal').style.display = 'none';
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const chatMsgs = document.getElementById('chatMessages');
+  chatMsgs.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+
+  // Add loading
+  const loadingId = 'loading_' + Date.now();
+  chatMsgs.innerHTML += `<div class="chat-msg ai" id="${loadingId}"><span class="ai-typing">思考中...</span></div>`;
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+  const systemPrompt = `你是專業的運動科學與健康心理學專家。你擅長用白話、溫暖的繁體中文解釋身體活動相關知識。
+你的知識領域包括：
+- 身體活動與健康（全球PA不足現況、WHO建議）
+- 目標設定理論（Locke & Latham）、SMART目標、學習型目標（Seijts & Latham）
+- 運動強度（LPA/MPA/VPA）、Biswas強度換算、VILPA概念
+- 雙模理論（Dual Mode Theory, Ekkekakis 2003）、情感與運動堅持
+- 自我效能理論（Bandura）、向上螺旋理論（Cappellen）
+- 運動補償效應（Gay 2017）
+- 上班族久坐與健康
+請以200字以內簡潔回答，給出實用建議。若問題超出範圍，禮貌告知專注領域。`;
+
+  try {
+    const reply = await callGroq(systemPrompt, msg);
+    document.getElementById(loadingId).innerHTML = reply;
+  } catch (e) {
+    document.getElementById(loadingId).innerHTML = '<span class="ai-error">AI 暫時無法回應</span>';
+  }
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+}
 </script>
 </body>
 </html>
