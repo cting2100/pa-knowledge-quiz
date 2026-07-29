@@ -397,7 +397,7 @@ function showMoveRule(){
     div.innerHTML=`
       <div>
         <div class="move-rule-text">⚠️ 規則反轉！<br><br>🟡 <span class="yellow">黃色</span>出現 → <b>代表規則反轉</b><br><br>預設：<span class="red">🔴紅＝跳</span>　<span class="blue">🔵藍＝蹲</span><br>反轉：<span class="red">🔴紅＝蹲</span>　<span class="blue">🔵藍＝跳</span><br><br>🟡 再出現 → 規則又轉回來<br>🟢綠色永遠不動</div>
-        <div style="font-size:14px;color:#8899aa;margin-top:10px">20 題，黃色出現 3 次，四種顏色都會出現</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">15 題，黃色出現 3 次，四種顏色都會出現</div>
         <div style="margin-top:24px"><button class="move-btn red-btn" onclick="startMovePractice()">開始挑戰 🔥</button></div>
       </div>`;
   }
@@ -432,18 +432,24 @@ function startMovePractice(){
     // Ensure at least 1 green or yellow for 3rd color
     if(o>0){mvSeq.push('green');for(let i=1;i<o;i++)mvSeq.push(allColors[Math.floor(Math.random()*4)])}
   }else{
-    // Phase 4 toggle: 20 items, ALL 4 colors must appear, exactly 3 yellows
-    // Force: 3 yellow, 5 red, 5 blue, 5 green, 2 extra from red/blue/green
+    // Phase 4 toggle: 15 items, all 4 colors, exactly 3 yellows, first 3 not yellow
     mvSeq=['yellow','yellow','yellow'];
-    for(let i=0;i<5;i++)mvSeq.push('red');
-    for(let i=0;i<5;i++)mvSeq.push('blue');
-    for(let i=0;i<5;i++)mvSeq.push('green');
-    mvSeq.push(['red','blue','green'][Math.floor(Math.random()*3)]);
-    mvSeq.push(['red','blue','green'][Math.floor(Math.random()*3)]);
+    for(let i=0;i<4;i++)mvSeq.push('red');
+    for(let i=0;i<4;i++)mvSeq.push('blue');
+    for(let i=0;i<4;i++)mvSeq.push('green');
     window._moveReversed=false;
   }
-  // Shuffle multiple times for true randomness
+  // Shuffle, then ensure first 3 are not yellow
   for(let i=0;i<3;i++){for(let j=mvSeq.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[mvSeq[j],mvSeq[k]]=[mvSeq[k],mvSeq[j]]}}
+  // Move any yellows out of first 3 positions
+  for(let pos=0;pos<3;pos++){
+    if(mvSeq[pos]==='yellow'){
+      // Find a non-yellow later in the array to swap with
+      for(let s=3;s<mvSeq.length;s++){
+        if(mvSeq[s]!=='yellow'){[mvSeq[pos],mvSeq[s]]=[mvSeq[s],mvSeq[pos]];break}
+      }
+    }
+  }
   mvIdx=0;
   showMoveBox();
 }
@@ -486,7 +492,7 @@ function showMoveBox(){
 function doneMove(){
   clearTimeout(mvTimer);
   const div=$('moveOverlayInner');
-  const total=5+5+10+20;
+  const total=5+5+10+15;
   div.innerHTML=`
     <div>
       <div style="font-size:64px">🎉</div>
