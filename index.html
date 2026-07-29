@@ -372,26 +372,33 @@ function startMoveOverlay(){
 
 function showMoveRule(){
   const div=$('moveOverlayInner');
-  if(mvPhase===0){ // RED rules
+  if(mvPhase===0){
     div.innerHTML=`
       <div>
         <div class="move-rule-text">看到 <span class="red">🔴 紅色</span><br>雙腳離地 <span class="red">跳起來！</span></div>
-        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，看到其他顏色不要動</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，其他顏色不要動</div>
         <div style="margin-top:24px"><button class="move-btn red-btn" onclick="startMovePractice()">開始練習 🔴</button></div>
       </div>`;
-  }else if(mvPhase===1){ // BLUE rules
+  }else if(mvPhase===1){
     div.innerHTML=`
       <div>
         <div class="move-rule-text">看到 <span class="blue">🔵 藍色</span><br><span class="blue">深蹲</span>下去！</div>
-        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，看到其他顏色不要動</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">練習 5 次，其他顏色不要動</div>
         <div style="margin-top:24px"><button class="move-btn blue-btn" onclick="startMovePractice()">開始練習 🔵</button></div>
       </div>`;
-  }else{ // FINAL challenge
+  }else if(mvPhase===2){
     div.innerHTML=`
       <div>
         <div style="font-size:32px;font-weight:900;background:linear-gradient(135deg,#ff4757,#ffa502,#2ed573,#3742fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">⚡ 終極大挑戰</div>
-        <div style="font-size:15px;color:#8899aa;line-height:1.6">混合 15 題<br>紅色＝跳！藍色＝蹲！<br>黃色／綠色＝<span style="color:#ffa502">站好不要動</span></div>
+        <div style="font-size:15px;color:#8899aa;line-height:1.6">混合 10 題<br>紅色＝跳！藍色＝蹲！<br>黃色／綠色＝<span style="color:#ffa502">站好不要動</span></div>
         <div style="margin-top:24px"><button class="move-btn green-btn" onclick="startMovePractice()">開始挑戰 💪</button></div>
+      </div>`;
+  }else{ // Phase 4: REVERSED rules
+    div.innerHTML=`
+      <div>
+        <div class="move-rule-text">⚠️ 規則反轉！<br>看到 <span class="yellow">🟡 黃色</span> → <span class="yellow">深蹲</span><br>看到 <span class="blue">🔵 藍色</span> → <span class="blue">往上跳</span>！</div>
+        <div style="font-size:14px;color:#8899aa;margin-top:10px">10 題，注意顏色跟動作和剛才不一樣！</div>
+        <div style="margin-top:24px"><button class="move-btn red-btn" onclick="startMovePractice()">開始挑戰 🔥</button></div>
       </div>`;
   }
 }
@@ -404,20 +411,28 @@ function startMovePractice(){
   function randExcept(excl,n){const pool=allColors.filter(c=>!excl.includes(c));const r=[];for(let i=0;i<n;i++)r.push(pool[Math.floor(Math.random()*pool.length)]);return r}
 
   if(mvPhase===0){
-    // Red practice: 2 red + 3 random other colors, fully shuffled
+    // Red practice: 2 red + 3 random other colors
     mvSeq=['red','red',...randExcept(['red'],3)];
   }else if(mvPhase===1){
     // Blue practice: 3 blue + 2 random other colors
     mvSeq=['blue','blue','blue',...randExcept(['blue'],2)];
-  }else{
-    // Final challenge: 15 items, 4-5 each of red/blue, rest random
-    const rCount=4+Math.floor(Math.random()*2); // 4 or 5
-    const bCount=4+Math.floor(Math.random()*2);
-    const oCount=15-rCount-bCount;
+  }else if(mvPhase===2){
+    // Final challenge: 10 items, mix red/blue + distractors
+    const r=3+Math.floor(Math.random()*2); // 3-4 red
+    const b=3+Math.floor(Math.random()*2); // 3-4 blue
+    const o=10-r-b;
     mvSeq=[];
-    for(let i=0;i<rCount;i++)mvSeq.push('red');
-    for(let i=0;i<bCount;i++)mvSeq.push('blue');
-    for(let i=0;i<oCount;i++)mvSeq.push(allColors[Math.floor(Math.random()*4)]);
+    for(let i=0;i<r;i++)mvSeq.push('red');
+    for(let i=0;i<b;i++)mvSeq.push('blue');
+    for(let i=0;i<o;i++)mvSeq.push(allColors[Math.floor(Math.random()*4)]);
+  }else{
+    // Phase 4 reversed: yellow=squat, blue=jump, 10 items
+    // Need yellow and blue mostly, + distractors
+    const y=4,bl=4,o=2;
+    mvSeq=[];
+    for(let i=0;i<y;i++)mvSeq.push('yellow');
+    for(let i=0;i<bl;i++)mvSeq.push('blue');
+    for(let i=0;i<o;i++)mvSeq.push(randExcept(['yellow','blue'],1)[0]);
   }
   // Shuffle multiple times for true randomness
   for(let i=0;i<3;i++){for(let j=mvSeq.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[mvSeq[j],mvSeq[k]]=[mvSeq[k],mvSeq[j]]}}
@@ -428,7 +443,7 @@ function startMovePractice(){
 function showMoveBox(){
   if(mvIdx>=mvSeq.length){
     mvPhase++;
-    if(mvPhase>=3){ doneMove();return }
+    if(mvPhase>=4){ doneMove();return }
     showMoveRule();
     return;
   }
@@ -448,22 +463,23 @@ function showMoveBox(){
   setTimeout(()=>{const s=$('moveBlink');if(s)s.classList.add('pop')},50);
 
   mvIdx++;
-  // Show block for 2.8s, then 0.4s blank, then next
+  // Show block for 2s, then 0.35s blank, then next
   mvTimer=setTimeout(()=>{
     const sq=$('moveBlink');if(sq)sq.classList.remove('pop');
     div.innerHTML='<div style="color:#222;font-size:60px">·</div>';
     mvTimer=setTimeout(showMoveBox,350);
-  },2500);
+  },2000);
 }
 
 function doneMove(){
   clearTimeout(mvTimer);
   const div=$('moveOverlayInner');
+  const total=5+5+10+10;
   div.innerHTML=`
     <div>
       <div style="font-size:64px">🎉</div>
-      <div class="move-done-msg">太棒了！你完成了！</div>
-      <div class="move-done-sub">25 次反應運動挑戰成功<br>短時間穿插活動就能促進健康<br>每天找空檔動一動，身體感謝你 💪</div>
+      <div class="move-done-msg">太棒了！你完成了 ${total} 次挑戰！</div>
+      <div class="move-done-sub">研究發現：短時間的穿插活動就能促進健康。<br>記得 <b>減少久坐、提升身體活動量</b>——<br>每 30 分鐘起身動一動，<br>每天多走幾步路，<br>身體會感謝你 💪</div>
       <button class="move-btn green-btn" onclick="closeMoveOverlay()" style="margin-top:20px">回到結果 🔙</button>
     </div>`;
 }
